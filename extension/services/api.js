@@ -1,23 +1,40 @@
 const API_BASE_URL = "http://localhost:3000/api/v1";
 
-const TOKEN =
-  "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.XzMXe6mosyQyDkynFFqMXpggArBY8q9qrErV_OuVbgk";
+import { getToken, logoutUser } from "./auth.js";
 
-/* CORE REQUEST WRAPPER */
 async function request(url, options = {}) {
+  const token = await getToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
   const response = await fetch(url, {
     ...options,
+
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${TOKEN}`,
+
+      Authorization: `Bearer ${token}`,
+
       ...(options.headers || {}),
     },
   });
 
   const data = await response.json();
 
+  if (response.status === 401) {
+    await logoutUser();
+
+    throw new Error("Session expired");
+  }
+
   if (!response.ok) {
-    throw new Error(data?.message || "API Error");
+    throw new Error(
+      data?.error ||
+      data?.message ||
+      "API Error"
+    );
   }
 
   return data;

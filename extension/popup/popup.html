@@ -2,70 +2,120 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
   <title>Clipboard Pro</title>
 
   <!-- GOOGLE FONTS -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
 
-  <!-- PRISM THEME (CODE HIGHLIGHTING) -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-
-  <!-- PRISM JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-
-  <!-- YOUR CSS -->
+  
+  <!-- CSS -->
   <link rel="stylesheet" href="popup.css" />
+
 </head>
 
 <body>
 
-  <div class="app">
+  <!-- AUTH SCREEN -->
+  <div id="auth-container"></div>
+
+  <!-- MAIN APP -->
+  <div class="app hidden" id="app">
 
     <!-- HEADER -->
     <header class="header">
-      <div class="logo">📋</div>
 
-      <div class="title">
-        <h1>Clipboard Pro</h1>
-        <p>Smart clipboard manager</p>
+      <div class="header-left">
+
+        <div class="logo">📋</div>
+
+        <div class="title">
+          <h1>Clipboard Pro</h1>
+          <p>Smart clipboard manager</p>
+        </div>
+
       </div>
+
+      <button id="logout-btn" class="logout-btn">
+        Logout
+      </button>
+
     </header>
 
     <!-- SEARCH -->
     <div class="search-box">
+
       <input
         id="search"
         type="text"
         placeholder="Search clips..."
         autocomplete="off"
       />
+
     </div>
 
-    <!-- FILTER TABS -->
+    <!-- FILTERS -->
     <div class="tabs">
-      <button class="tab active" data-type="all">All</button>
-      <button class="tab" data-type="code">Code</button>
-      <button class="tab" data-type="text">Text</button>
-      <button class="tab" data-type="link">Links</button>
+
+      <button
+        class="tab active"
+        data-type="all"
+      >
+        All
+      </button>
+
+      <button
+        class="tab"
+        data-type="code"
+      >
+        Code
+      </button>
+
+      <button
+        class="tab"
+        data-type="text"
+      >
+        Text
+      </button>
+
+      <button
+        class="tab"
+        data-type="link"
+      >
+        Links
+      </button>
+
     </div>
 
-    <!-- CLIPS LIST -->
+    <!-- CLIPS -->
     <div id="list"></div>
 
   </div>
 
   <!-- TOAST -->
-  <div id="toast">Copied ✔</div>
+  <div id="toast">
+    Copied ✔
+  </div>
 
-  <!-- POPUP JS -->
-  <script type="module" src="popup.js"></script>
+  <!-- AUTH TOAST -->
+  <div id="auth-toast"></div>
+
+  <!-- JS -->
+  <script
+    type="module"
+    src="popup.js"
+  ></script>
 
 </body>
+
 </html>

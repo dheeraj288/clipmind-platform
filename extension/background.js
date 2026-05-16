@@ -4,11 +4,19 @@ console.log("Background Running");
 const API_BASE_URL =
   "http://localhost:3000/api/v1";
 
-const TOKEN =
-  "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.XzMXe6mosyQyDkynFFqMXpggArBY8q9qrErV_OuVbgk";
-
 /* DUPLICATE STORE */
 const recentClips = new Map();
+
+/* GET AUTH TOKEN */
+async function getToken() {
+
+  const result =
+    await chrome.storage.local.get(
+      "token"
+    );
+
+  return result.token;
+}
 
 /* DUPLICATE CHECK */
 function isDuplicate(text) {
@@ -37,6 +45,19 @@ async function syncClipToServer(
 
   try {
 
+    const token =
+      await getToken();
+
+    /* USER NOT LOGGED IN */
+    if (!token) {
+
+      console.log(
+        "No authenticated user"
+      );
+
+      return;
+    }
+
     const text =
       message.content;
 
@@ -51,7 +72,7 @@ async function syncClipToServer(
               "application/json",
 
             Authorization:
-              `Bearer ${TOKEN}`,
+              `Bearer ${token}`,
           },
 
           body: JSON.stringify({
@@ -79,6 +100,21 @@ async function syncClipToServer(
           }),
         }
       );
+
+    /* UNAUTHORIZED */
+    if (response.status === 401) {
+
+      console.error(
+        "Unauthorized user"
+      );
+
+      await chrome.storage.local.remove([
+        "token",
+        "currentUser",
+      ]);
+
+      return;
+    }
 
     const data =
       await response.json();

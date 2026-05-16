@@ -5,7 +5,19 @@ import {
   incrementCopyApi,
 } from "../services/api.js";
 
+import {
+  getToken,
+  logoutUser,
+} from "../services/auth.js";
+
+import {
+  renderAuth,
+} from "./authView.js";
+
 /* ELEMENTS */
+const app = document.getElementById("app");
+const authContainer = document.getElementById("auth-container");
+
 const list = document.getElementById("list");
 const search = document.getElementById("search");
 const toast = document.getElementById("toast");
@@ -14,114 +26,105 @@ const toast = document.getElementById("toast");
 let data = [];
 let currentFilter = "all";
 
-/* ESCAPE HTML */
-function escapeHtml(text = "") {
-  return text
+/* HELPERS */
+const escapeHtml = (text = "") =>
+  text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-}
 
-/* TOAST */
-function showToast(message = "Copied ✔") {
+const safeTime = (item) =>
+  new Date(
+    item.created_at || Date.now()
+  ).toLocaleString();
+
+const showToast = (
+  message = "Copied ✔"
+) => {
+
   toast.textContent = message;
+
   toast.classList.add("show");
 
   setTimeout(() => {
     toast.classList.remove("show");
   }, 1200);
-}
+};
 
+const copyToClipboard = async (text) => {
+  await navigator.clipboard.writeText(text);
+};
 
-function sortData(items) {
-  return [...items].sort((a, b) => {
-    return getSmartScore(b) - getSmartScore(a);
-  });
-}
+const getBadge = (type) => ({
+  code: "💻 CODE",
+  text: "📝 TEXT",
+  link: "🌐 LINK",
+  json: "📦 JSON",
+  email: "📧 EMAIL",
+  command: "⚡ COMMAND",
+}[type] || "📋 CLIP");
 
-/* SAFE TIME */
-function safeTime(item) {
-  return new Date(item.created_at || Date.now()).toLocaleString();
-}
+const getSmartScore = (item) => {
 
-/* FILTER */
-function filterData(items) {
-  if (currentFilter === "all") return items;
-
-  return items.filter((item) => {
-    return item.clip_type === currentFilter;
-  });
-}
-
-/* SORT */
-function getSmartScore(item) {
   let score = 0;
 
-  /* ⭐ FAVORITE BOOST */
-  if (item.is_favorite) {
-    score += 1000;
-  }
+  if (item.is_favorite) score += 1000;
 
-  /* 📋 COPY COUNT BOOST */
   score += (item.copy_count || 0) * 50;
 
-  /* ⏱️ RECENCY BOOST */
-  const createdAt = new Date(item.created_at).getTime();
   const hoursAgo =
-    (Date.now() - createdAt) / (1000 * 60 * 60);
+    (Date.now() -
+      new Date(item.created_at)) /
+    (1000 * 60 * 60);
 
   if (hoursAgo < 1) score += 500;
   else if (hoursAgo < 6) score += 300;
   else if (hoursAgo < 24) score += 100;
   else if (hoursAgo < 72) score += 50;
 
-  /* 🧠 TYPE PRIORITY BOOST */
   if (item.clip_type === "code") score += 200;
   if (item.clip_type === "link") score += 150;
 
   return score;
-}
+};
 
-/* BADGE */
-function getBadge(type) {
-  const badgeMap = {
-    code: "💻 CODE",
-    text: "📝 TEXT",
-    link: "🌐 LINK",
-    json: "📦 JSON",
-    email: "📧 EMAIL",
-    command: "⚡ COMMAND",
+const sortData = (items) =>
+  [...items].sort(
+    (a, b) =>
+      getSmartScore(b) -
+      getSmartScore(a)
+  );
+
+const filterData = (items) =>
+  currentFilter === "all"
+    ? items
+    : items.filter(
+        (i) =>
+          i.clip_type ===
+          currentFilter
+      );
+
+/* LOGOUT */
+function setupLogout() {
+
+  const logoutBtn =
+    document.getElementById(
+      "logout-btn"
+    );
+
+  if (!logoutBtn) return;
+
+  logoutBtn.onclick = async () => {
+
+    await logoutUser();
+
+    location.reload();
   };
-
-  return badgeMap[type] || "📋 CLIP";
 }
 
-/* COPY */
-async function copyToClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
+/* GROUPS */
+function groupItems(items) {
 
-/* RENDER */
-function render(items = []) {
-  list.innerHTML = "";
-
-  const finalData = filterData(sortData(items));
-
-  if (!finalData.length) {
-    list.innerHTML = `
-      <div class="empty">
-        No clips found 🚀
-      </div>
-    `;
-    return;
-  }
-
-  /* GROUPS */
   const groups = {
     today: [],
     yesterday: [],
@@ -130,287 +133,342 @@ function render(items = []) {
   };
 
   const now = new Date();
-  const oneDay = 1000 * 60 * 60 * 24;
 
-  finalData.forEach((item) => {
-    const created = new Date(item.created_at);
+  const oneDay =
+    1000 * 60 * 60 * 24;
+
+  items.forEach((item) => {
+
+    const created =
+      new Date(item.created_at);
+
     const diff = now - created;
 
-    if (created.toDateString() === now.toDateString()) {
+    if (
+      created.toDateString() ===
+      now.toDateString()
+    ) {
       groups.today.push(item);
-    } else if (diff < oneDay * 2) {
+
+    } else if (
+      diff < oneDay * 2
+    ) {
       groups.yesterday.push(item);
-    } else if (diff < oneDay * 7) {
+
+    } else if (
+      diff < oneDay * 7
+    ) {
       groups.thisWeek.push(item);
+
     } else {
       groups.older.push(item);
     }
   });
 
-  /* SECTION RENDER */
-  function renderSection(title, items) {
-    if (!items.length) return;
+  return groups;
+}
 
-    const section = document.createElement("div");
-    section.className = "timeline-section";
+/* CARD */
+function createCard(item) {
 
-    section.innerHTML = `
-      <div class="timeline-title">
-        ${title}
-      </div>
-    `;
+  const card =
+    document.createElement("div");
 
-    items.forEach((item) => {
-      const type = item.clip_type || "text";
-      const language = item.language || "plaintext";
+  card.className = "card";
 
-      const card = document.createElement("div");
-      card.className = "card";
+  const type =
+    item.clip_type || "text";
 
-      /* BADGE */
-      const badge = document.createElement("div");
-      badge.className = "badge";
-      badge.textContent = getBadge(type);
-
-      /* ACTIONS */
-      const actions = document.createElement("div");
-      actions.className = "actions";
-
-      const del = document.createElement("button");
-      del.className = "icon-btn delete";
-      del.innerHTML = "×";
-
-      del.onclick = async (e) => {
-        e.stopPropagation();
-        await handleDelete(item.id);
-      };
-
-      const pin = document.createElement("button");
-      pin.className = "icon-btn pin";
-      pin.innerHTML = item.is_favorite ? "⭐" : "☆";
-
-      pin.onclick = async (e) => {
-        e.stopPropagation();
-        await handleFavorite(item.id);
-      };
-
-      actions.append(del, pin);
-
-      /* META */
-      const meta = document.createElement("div");
-      meta.className = "meta";
-
-      let hostname = "";
-
-      try {
-        if (item.source_url) {
-          hostname = new URL(item.source_url).hostname;
-        }
-      } catch (e) {}
-
-      const favicon = item.source_url
-        ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`
+  const hostname = (() => {
+    try {
+      return item.source_url
+        ? new URL(item.source_url)
+            .hostname
         : "";
+    } catch {
+      return "";
+    }
+  })();
 
-      const pageTitle =
-        item.page_title || hostname || "Unknown Source";
+  const favicon = hostname
+    ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`
+    : "";
 
-      let youtubeThumb = "";
+  const pageTitle =
+    item.page_title ||
+    hostname ||
+    "Unknown Source";
+
+    let youtubeThumb = "";
 
       if (
         item.source_url &&
         item.source_url.includes("youtube.com")
       ) {
+
         try {
-          const url = new URL(item.source_url);
-          const videoId = url.searchParams.get("v");
+
+          const url =
+            new URL(item.source_url);
+
+          const videoId =
+            url.searchParams.get("v");
 
           if (videoId) {
+
             youtubeThumb =
               `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
           }
-        } catch (e) {}
+
+        } catch {}
       }
 
-      meta.innerHTML = `
+  card.innerHTML = `
+    <div class="badge">
+      ${getBadge(type)}
+    </div>
+
+    <div class="actions">
+
+      <button
+        class="icon-btn delete"
+        data-delete="${item.id}"
+      >
+        ×
+      </button>
+
+      <button
+        class="icon-btn pin"
+        data-fav="${item.id}"
+      >
         ${
-          youtubeThumb
-            ? `<img src="${youtubeThumb}" class="yt-thumb" />`
+          item.is_favorite
+            ? "⭐"
+            : "☆"
+        }
+      </button>
+
+    </div>
+
+    <div class="meta">
+
+      ${
+        youtubeThumb
+          ? `
+          <img
+            src="${youtubeThumb}"
+            class="yt-thumb"
+          />
+        `
+          : ""
+      }
+
+      <div class="meta-left">
+
+        ${
+          favicon
+            ? `
+            <img
+              src="${favicon}"
+              class="favicon"
+            />
+          `
             : ""
         }
 
-        <div class="meta-left">
-          ${
-            favicon
-              ? `<img src="${favicon}" class="favicon" />`
-              : ""
-          }
+        <div class="meta-info">
 
-          <div class="meta-info">
-            <div class="meta-title">
-              ${escapeHtml(pageTitle)}
-            </div>
-
-            <div class="meta-domain">
-              ${hostname}
-            </div>
+          <div class="meta-title">
+            ${escapeHtml(pageTitle)}
           </div>
+
+          <div class="meta-domain">
+            ${hostname}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="content ${
+      type === "code"
+        ? "code"
+        : ""
+    }">
+
+      ${
+        type === "link"
+          ? `
+          <a
+            href="${item.content}"
+            target="_blank"
+            class="clip-link"
+          >
+            ${item.content}
+          </a>
+        `
+          : `
+          ${
+            type === "code"
+              ? `
+              <pre class="code-block">
+<code>
+${escapeHtml(item.content)}
+</code>
+              </pre>
+            `
+              : `
+              <div class="text-content">
+                ${escapeHtml(item.content)}
+              </div>
+            `
+          }
+        `
+      }
+
+    </div>
+
+    <div class="time">
+
+      <span>
+        ${safeTime(item)}
+      </span>
+
+      <span class="copy-count">
+        📋 ${item.copy_count || 0}
+      </span>
+
+    </div>
+  `;
+
+  /* COPY */
+  card.onclick = async () => {
+
+    try {
+
+      await copyToClipboard(
+        item.content
+      );
+
+      showToast();
+
+      const res =
+        await incrementCopyApi(
+          item.id
+        );
+
+      item.copy_count =
+        res.copy_count;
+
+      render(data);
+
+    } catch {
+      showToast("Copy failed ❌");
+    }
+  };
+
+  /* DELETE */
+  card
+    .querySelector("[data-delete]")
+    .onclick = async (e) => {
+
+      e.stopPropagation();
+
+      await deleteClipApi(item.id);
+
+      await load();
+    };
+
+  /* FAVORITE */
+  card
+    .querySelector("[data-fav]")
+    .onclick = async (e) => {
+
+      e.stopPropagation();
+
+      await toggleFavoriteApi(
+        item.id
+      );
+
+      await load();
+    };
+
+  return card;
+}
+
+/* RENDER */
+function render(items = []) {
+
+  list.innerHTML = "";
+
+  const finalData =
+    filterData(
+      sortData(items)
+    );
+
+  if (!finalData.length) {
+
+    list.innerHTML = `
+      <div class="empty">
+        No clips found 🚀
+      </div>
+    `;
+
+    return;
+  }
+
+  const groups =
+    groupItems(finalData);
+
+  Object.entries(groups).forEach(
+    ([title, items]) => {
+
+      if (!items.length) return;
+
+      const section =
+        document.createElement(
+          "div"
+        );
+
+      section.className =
+        "timeline-section";
+
+      section.innerHTML = `
+        <div class="timeline-title">
+          ${title.toUpperCase()}
         </div>
       `;
 
-      /* CONTENT */
-      const content = document.createElement("div");
+      items.forEach((item) => {
+        section.appendChild(
+          createCard(item)
+        );
+      });
 
-      if (type === "code") {
-        content.className = "content code";
-
-        content.innerHTML = `
-          <div class="code-header">
-            <span>${language.toUpperCase()}</span>
-          </div>
-
-          <pre class="code-block">
-            <code class="language-${language}">
-${escapeHtml(item.content)}
-            </code>
-          </pre>
-        `;
-
-        setTimeout(() => {
-          if (window.Prism) Prism.highlightAll();
-        }, 0);
-      } else if (type === "link") {
-        content.className = "content";
-
-        content.innerHTML = `
-          <a href="${item.content}" target="_blank" class="clip-link">
-            ${item.content}
-          </a>
-        `;
-      } else {
-        content.className = "content";
-
-        const isLong = item.content.length > 220;
-        const shortText = item.content.slice(0, 220);
-
-        content.innerHTML = `
-          <div class="text-content">
-            ${
-              isLong
-                ? `
-              <span class="preview-text">
-                ${escapeHtml(shortText)}...
-              </span>
-
-              <span class="full-text hidden">
-                ${escapeHtml(item.content)}
-              </span>
-
-              <button class="expand-btn">
-                Show More
-              </button>
-            `
-                : `<span>${escapeHtml(item.content)}</span>`
-            }
-          </div>
-        `;
-
-        if (isLong) {
-          const btn = content.querySelector(".expand-btn");
-          const preview = content.querySelector(".preview-text");
-          const full = content.querySelector(".full-text");
-
-          btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-
-            const expanded =
-              !full.classList.contains("hidden");
-
-            if (expanded) {
-              full.classList.add("hidden");
-              preview.classList.remove("hidden");
-              btn.textContent = "Show More";
-            } else {
-              full.classList.remove("hidden");
-              preview.classList.add("hidden");
-              btn.textContent = "Show Less";
-            }
-          });
-        }
-      }
-
-      /* SOURCE LINK */
-      let sourcePreview = "";
-
-      if (item.source_url) {
-        const domain = (() => {
-          try {
-            return new URL(item.source_url).hostname.replace("www.", "");
-          } catch {
-            return "";
-          }
-        })();
-
-        sourcePreview = `
-          <a class="source-link" href="${item.source_url}" target="_blank">
-            🌐 ${domain}
-          </a>
-        `;
-      }
-
-      /* TIME + COPY COUNT */
-      const time = document.createElement("div");
-      time.className = "time";
-
-      time.innerHTML = `
-        <span>${safeTime(item)}</span>
-        <span class="copy-count">📋 ${item.copy_count || 0}</span>
-      `;
-
-      card.onclick = async () => {
-        try {
-          await copyToClipboard(item.content);
-
-          card.classList.add("copied");
-          setTimeout(() => card.classList.remove("copied"), 300);
-
-          showToast("Copied ✔");
-
-          const res = await incrementCopyApi(item.id);
-
-          // ONLY trust backend
-          item.copy_count = res.copy_count;
-
-          render(data);
-
-        } catch (err) {
-          console.error(err);
-          showToast("Copy failed ❌");
-        }
-      };
-      /* APPEND */
-      card.innerHTML += sourcePreview;
-
-      card.append(badge, actions, meta, content, time);
-      section.appendChild(card);
-    });
-
-    list.appendChild(section);
-  }
-
-  renderSection("TODAY", groups.today);
-  renderSection("YESTERDAY", groups.yesterday);
-  renderSection("THIS WEEK", groups.thisWeek);
-  renderSection("OLDER", groups.older);
+      list.appendChild(section);
+    }
+  );
 }
 
 /* LOAD */
 async function load() {
+
   try {
-    const response = await fetchClips();
-    data = Array.isArray(response) ? response : [];
+
+    const response =
+      await fetchClips();
+
+    data =
+      Array.isArray(response)
+        ? response
+        : [];
+
     render(data);
+
   } catch (error) {
+
     console.error(error);
 
     list.innerHTML = `
@@ -421,49 +479,89 @@ async function load() {
   }
 }
 
-/* DELETE */
-async function handleDelete(id) {
-  await deleteClipApi(id);
-  await load();
-}
-
-/* FAVORITE */
-async function handleFavorite(id) {
-  await toggleFavoriteApi(id);
-  await load();
-}
-
 /* SEARCH */
-let t = null;
+search?.addEventListener(
+  "input",
 
-search?.addEventListener("input", (e) => {
-  clearTimeout(t);
+  (e) => {
 
-  t = setTimeout(() => {
-    const value = e.target.value.toLowerCase();
+    const value =
+      e.target.value.toLowerCase();
 
-    const filtered = data.filter((item) =>
-      item.content?.toLowerCase().includes(value)
-    );
+    const filtered =
+      data.filter((item) =>
+        item.content
+          ?.toLowerCase()
+          .includes(value)
+      );
 
     render(filtered);
-  }, 150);
-});
+  }
+);
 
-/* TABS */
-document.querySelectorAll(".tab").forEach((tab) => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach((b) => {
-      b.classList.remove("active");
-    });
+/* FILTER TABS */
+document
+  .querySelectorAll(".tab")
+  .forEach((tab) => {
 
-    tab.classList.add("active");
+    tab.addEventListener(
+      "click",
 
-    currentFilter = tab.dataset.type;
+      () => {
 
-    render(data);
+        document
+          .querySelectorAll(".tab")
+          .forEach((b) =>
+            b.classList.remove(
+              "active"
+            )
+          );
+
+        tab.classList.add(
+          "active"
+        );
+
+        currentFilter =
+          tab.dataset.type;
+
+        render(data);
+      }
+    );
   });
-});
 
 /* INIT */
-load();
+async function init() {
+
+  const token =
+    await getToken();
+
+  if (!token) {
+
+    app.classList.add("hidden");
+
+    renderAuth(
+      authContainer,
+
+      async () => {
+
+        authContainer.innerHTML = "";
+
+        app.classList.remove("hidden");
+
+        await load();
+
+        setupLogout();
+      }
+    );
+
+    return;
+  }
+
+  app.classList.remove("hidden");
+
+  await load();
+
+  setupLogout();
+}
+
+init();
