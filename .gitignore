@@ -1,0 +1,14 @@
+# Rails
+backend/tmp
+backend/log
+backend/storage
+backend/.env
+backend/.bundle
+backend/node_modules
+
+# Extension
+extension/node_modules
+
+# system
+.DS_Store
+*.log

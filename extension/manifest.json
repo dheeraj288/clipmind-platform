@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+
+  "name": "Clipboard Pro",
+
+  "version": "4.0.0",
+
+  "description": "Modern clipboard manager",
+
+  "permissions": [
+  "storage",
+  "tabs",
+  "scripting"
+  ],
+
+  "host_permissions": [
+    "<all_urls>",
+    "http://localhost:3000/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
