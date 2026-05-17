@@ -77,6 +77,18 @@ const getSmartScore = (item) => {
       new Date(item.created_at)) /
     (1000 * 60 * 60);
 
+    if (item.last_copied_at) {
+
+      const copiedAgo =
+        (Date.now() -
+          new Date(item.last_copied_at)) /
+        (1000 * 60);
+
+      if (copiedAgo < 2) {
+        score += 5000;
+      }
+    }
+
   if (hoursAgo < 1) score += 500;
   else if (hoursAgo < 6) score += 300;
   else if (hoursAgo < 24) score += 100;
@@ -180,12 +192,16 @@ function createCard(item) {
     item.clip_type || "text";
 
   const hostname = (() => {
+
     try {
+
       return item.source_url
         ? new URL(item.source_url)
             .hostname
         : "";
+
     } catch {
+
       return "";
     }
   })();
@@ -199,31 +215,40 @@ function createCard(item) {
     hostname ||
     "Unknown Source";
 
-    let youtubeThumb = "";
+  /* YOUTUBE THUMB */
+  let youtubeThumb = "";
 
-      if (
-        item.source_url &&
-        item.source_url.includes("youtube.com")
-      ) {
+  if (
+    item.source_url &&
+    item.source_url.includes("youtube.com")
+  ) {
 
-        try {
+    try {
 
-          const url =
-            new URL(item.source_url);
+      const url =
+        new URL(item.source_url);
 
-          const videoId =
-            url.searchParams.get("v");
+      const videoId =
+        url.searchParams.get("v");
 
-          if (videoId) {
+      if (videoId) {
 
-            youtubeThumb =
-              `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-          }
-
-        } catch {}
+        youtubeThumb =
+          `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
       }
 
+    } catch {}
+  }
+
+  /* LONG TEXT */
+  const isLong =
+    item.content &&
+    item.content.length > 220;
+
   card.innerHTML = `
+
+    <div class="card-glow"></div>
+
     <div class="badge">
       ${getBadge(type)}
     </div>
@@ -234,7 +259,7 @@ function createCard(item) {
         class="icon-btn delete"
         data-delete="${item.id}"
       >
-        ×
+        ✕
       </button>
 
       <button
@@ -279,12 +304,32 @@ function createCard(item) {
         <div class="meta-info">
 
           <div class="meta-title">
-            ${escapeHtml(pageTitle)}
+
+            ${
+              item.source_url
+                ? `
+                <a
+                  href="${item.source_url}"
+                  target="_blank"
+                  class="title-link"
+                >
+                  ${escapeHtml(pageTitle)}
+                </a>
+              `
+                : escapeHtml(pageTitle)
+            }
+
           </div>
 
-          <div class="meta-domain">
-            ${hostname}
-          </div>
+          ${
+            hostname
+              ? `
+              <div class="meta-domain">
+                ${hostname}
+              </div>
+            `
+              : ""
+          }
 
         </div>
 
@@ -300,28 +345,73 @@ function createCard(item) {
 
       ${
         type === "link"
+
           ? `
           <a
             href="${item.content}"
             target="_blank"
             class="clip-link"
           >
-            ${item.content}
+            🔗 ${item.content}
           </a>
         `
+
           : `
+
           ${
             type === "code"
               ? `
-              <pre class="code-block">
-<code>
-${escapeHtml(item.content)}
-</code>
-              </pre>
+              <div class="code-wrapper">
+
+                <div class="code-header">
+
+                  <div class="lang-badge">
+                    ${item.language || "CODE"}
+                  </div>
+
+                  ${
+                    item.content.length > 300
+                      ? `
+                      <button class="expand-btn code-expand-btn">
+                        See More
+                      </button>
+                    `
+                      : ""
+                  }
+
+                </div>
+
+                <pre class="code-block ${
+                  item.content.length > 300
+                    ? "collapsed-code"
+                    : ""
+                }">
+            <code>${escapeHtml(item.content)}</code>
+                </pre>
+
+
+              </div>
             `
+
               : `
               <div class="text-content">
-                ${escapeHtml(item.content)}
+
+                <div class="clip-text ${
+                  isLong ? "clamped" : ""
+                }">
+                  ${escapeHtml(item.content)}
+                </div>
+
+                ${
+                  isLong
+                    ? `
+                    <button class="text-expand-btn">
+                      See More
+                    </button>
+                  `
+                    : ""
+                }
+
               </div>
             `
           }
@@ -343,7 +433,135 @@ ${escapeHtml(item.content)}
     </div>
   `;
 
-  /* COPY */
+/* TEXT EXPAND */
+
+        // ===== TEXT EXPAND =====
+
+const textExpandBtn =
+  card.querySelector(
+    ".text-expand-btn"
+  );
+
+const clipText =
+  card.querySelector(
+    ".clip-text"
+  );
+
+textExpandBtn?.addEventListener(
+  "click",
+  (e) => {
+
+    e.stopPropagation();
+
+    const expanded =
+      clipText.classList.contains(
+        "expanded"
+      );
+
+    if (expanded) {
+
+      clipText.classList.remove(
+        "expanded"
+      );
+
+      clipText.classList.add(
+        "clamped"
+      );
+
+      textExpandBtn.textContent =
+        "See More";
+
+    } else {
+
+      clipText.classList.remove(
+        "clamped"
+      );
+
+      clipText.classList.add(
+        "expanded"
+      );
+
+      textExpandBtn.textContent =
+        "See Less";
+    }
+  }
+);
+
+// ===== CODE EXPAND =====
+
+const codeExpandBtn =
+  card.querySelector(
+    ".code-expand-btn"
+  );
+
+const codeBlock =
+  card.querySelector(
+    ".code-block"
+  );
+
+codeExpandBtn?.addEventListener(
+  "click",
+  (e) => {
+
+    e.stopPropagation();
+
+    const expanded =
+      codeBlock.classList.contains(
+        "expanded-code"
+      );
+
+    if (expanded) {
+
+      codeBlock.classList.remove(
+        "expanded-code"
+      );
+
+      codeBlock.classList.add(
+        "collapsed-code"
+      );
+
+      codeExpandBtn.textContent =
+        "See More";
+
+    } else {
+
+      codeBlock.classList.remove(
+        "collapsed-code"
+      );
+
+      codeBlock.classList.add(
+        "expanded-code"
+      );
+
+      codeExpandBtn.textContent =
+        "See Less";
+    }
+  }
+);
+  /* COPY CODE */
+  const copyCodeBtn =
+    card.querySelector(
+      ".copy-code-btn"
+    );
+
+  copyCodeBtn?.addEventListener(
+    "click",
+
+    async (e) => {
+
+      e.stopPropagation();
+
+      await copyToClipboard(
+        item.content
+      );
+
+      showToast(
+        "Code copied ✔"
+      );
+    }
+  );
+
+  /* COPY CARD */
   card.onclick = async () => {
 
     try {
@@ -351,6 +569,18 @@ ${escapeHtml(item.content)}
       await copyToClipboard(
         item.content
       );
+
+      card.classList.add(
+        "copied"
+      );
+
+      setTimeout(() => {
+
+        card.classList.remove(
+          "copied"
+        );
+
+      }, 300);
 
       showToast();
 
@@ -362,10 +592,15 @@ ${escapeHtml(item.content)}
       item.copy_count =
         res.copy_count;
 
+        item.last_copied_at = new Date().toISOString();
+
       render(data);
 
     } catch {
-      showToast("Copy failed ❌");
+
+      showToast(
+        "Copy failed ❌"
+      );
     }
   };
 
@@ -376,7 +611,9 @@ ${escapeHtml(item.content)}
 
       e.stopPropagation();
 
-      await deleteClipApi(item.id);
+      await deleteClipApi(
+        item.id
+      );
 
       await load();
     };

@@ -3,147 +3,113 @@ import {
   signupUser,
 } from "../services/auth.js";
 
-export function renderAuth(
-  container,
-  onSuccess
-) {
-
+export function renderAuth(container, onSuccess) {
   container.innerHTML = `
+<div class="auth-screen">
 
-    <div class="auth-screen">
+  <div class="auth-card">
 
-      <div class="auth-card">
+    <div class="auth-top">
 
-        <div class="auth-logo">
-          📋
-        </div>
-
-        <h1>
-          Clipboard Pro
-        </h1>
-
-        <p class="auth-subtitle">
-          Smart cloud clipboard manager
-        </p>
-
-        <div class="auth-form">
-
-          <input
-            type="email"
-            id="email"
-            placeholder="Enter email"
-          />
-
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter password"
-          />
-
-          <button id="login-btn">
-            Login
-          </button>
-
-          <button id="signup-btn" class="secondary-btn">
-            Create Account
-          </button>
-
-          <div id="auth-error"></div>
-
-        </div>
-
+      <div class="auth-logo">
+        📋
       </div>
 
+      <h1>Clipboard Pro</h1>
+
+      <p class="auth-subtitle">
+        Smart cloud clipboard manager
+      </p>
+
     </div>
-  `;
 
-  const loginBtn =
-    document.getElementById(
-      "login-btn"
-    );
+    <div class="auth-form">
 
-  const signupBtn =
-    document.getElementById(
-      "signup-btn"
-    );
+      <div class="input-group">
+        <input type="email" id="email" placeholder="Enter email" />
+      </div>
 
-  loginBtn.addEventListener(
-    "click",
+      <div class="input-group">
+        <input type="password" id="password" placeholder="Enter password" />
+      </div>
 
-    async () => {
+      <button id="login-btn" class="primary-btn">
+        Login
+      </button>
 
-      try {
+      <button id="signup-btn" class="secondary-btn">
+        Create Account
+      </button>
 
-        const email =
-          document.getElementById(
-            "email"
-          ).value;
+      <div id="auth-error" class="auth-error"></div>
 
-        const password =
-          document.getElementById(
-            "password"
-          ).value;
+    </div>
 
-        await loginUser(
-          email,
-          password
-        );
+  </div>
 
-        onSuccess();
+</div>
+`;
 
-      } catch (err) {
+  const errorBox = document.getElementById("auth-error");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
 
-        console.error(err);
+  function showError(message) {
+    errorBox.textContent = message || "Something went wrong";
+    errorBox.classList.add("show");
+  }
 
-        document.getElementById(
-          "auth-error"
-        ).textContent =
-          err.message;
+  function clearError() {
+    errorBox.textContent = "";
+    errorBox.classList.remove("show");
+  }
+
+  /* LOGIN */
+  document.getElementById("login-btn").addEventListener("click", async () => {
+    clearError();
+
+    try {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!email || !password) {
+        showError("Email and password required");
+        return;
       }
+
+      await loginUser(email, password);
+
+      onSuccess();
+    } catch (err) {
+      console.error("LOGIN ERROR:", err);
+      showError(err?.message || "Login failed");
     }
-  );
+  });
 
-  signupBtn.addEventListener(
-    "click",
+  /* SIGNUP */
+  document.getElementById("signup-btn").addEventListener("click", async () => {
+    clearError();
 
-    async () => {
+    try {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
 
-      try {
-
-        const email =
-          document.getElementById(
-            "email"
-          ).value;
-
-        const password =
-          document.getElementById(
-            "password"
-          ).value;
-
-        await signupUser({
-
-          name:
-            email.split("@")[0],
-
-          email,
-
-          password,
-
-          password_confirmation:
-            password,
-        });
-
-        onSuccess();
-
-      } catch (err) {
-
-        console.error(err);
-
-        document.getElementById(
-          "auth-error"
-        ).textContent =
-          err.message;
+      if (!email || !password) {
+        showError("Email and password required");
+        return;
       }
+
+      await signupUser({
+        name: email.split("@")[0],
+        email,
+        password,
+        password_confirmation: password,
+      });
+
+      onSuccess();
+    } catch (err) {
+      console.error("SIGNUP ERROR:", err);
+      showError(err?.message || "Signup failed");
     }
-  );
+  });
 }
