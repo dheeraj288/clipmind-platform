@@ -1,3 +1,49 @@
+const semanticMap = {
+
+  database: [
+    "sql",
+    "postgres",
+    "mysql",
+    "schema",
+    "migration",
+    "activerecord",
+  ],
+
+  rails: [
+    "ruby",
+    "controller",
+    "model",
+    "route",
+    "activeadmin",
+    "erb",
+    "api",
+  ],
+
+  api: [
+    "json",
+    "endpoint",
+    "fetch",
+    "axios",
+    "request",
+  ],
+
+  javascript: [
+    "js",
+    "node",
+    "frontend",
+    "react",
+    "function",
+  ],
+
+  auth: [
+    "jwt",
+    "token",
+    "login",
+    "signup",
+    "session",
+  ],
+};
+
 export function smartSearch(
   items,
   query
@@ -41,7 +87,7 @@ export function smartSearch(
         return;
       }
 
-      /* HOT / TRENDING */
+      /* HOT */
       if (
         word === "hot" ||
         word === "trending"
@@ -76,16 +122,6 @@ export function smartSearch(
         return;
       }
 
-      /* EMAIL */
-      if (word === "email") {
-
-        if (type !== "email") {
-          matched = false;
-        }
-
-        return;
-      }
-
       /* RECENT */
       if (
         word === "recent" ||
@@ -108,12 +144,24 @@ export function smartSearch(
         return;
       }
 
-      /* NORMAL TEXT SEARCH */
-      const textMatch =
+      /* SEMANTIC SEARCH */
+      const semanticWords =
+        semanticMap[word] || [];
+
+      const semanticMatch =
+        semanticWords.some((term) =>
+          content.includes(term)
+        );
+
+      /* NORMAL MATCH */
+      const normalMatch =
         content.includes(word) ||
         title.includes(word);
 
-      if (!textMatch) {
+      if (
+        !normalMatch &&
+        !semanticMatch
+      ) {
         matched = false;
       }
 

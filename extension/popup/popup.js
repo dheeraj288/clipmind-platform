@@ -1,12 +1,9 @@
 import { createCard } from "./components/ClipCard.js";
 import { groupItems } from "./utils/groupItems.js";
 import { sortData } from "./utils/smartScore.js";
-import {
-  fetchClips,
-  fetchTrendingClips,
-} from "../services/api.js";
-import { smartSearch }
-  from "./utils/smartSearch.js";
+import {fetchClips,fetchTrendingClips,} from "../services/api.js";
+import { smartSearch } from "./utils/smartSearch.js";
+import { getRecommendations } from "./utils/aiMemory.js";
 import { getToken, logoutUser } from "../services/auth.js";
 import { renderAuth } from "./authView.js";
 import { showToast } from "./utils/showToast.js";
@@ -51,6 +48,38 @@ function render(items = []) {
   }
 
   const groups = groupItems(finalData);
+  const recommended = getRecommendations(finalData);
+  if (recommended.length) {
+
+  const recSection =
+    document.createElement("div");
+
+  recSection.className =
+    "timeline-section";
+
+  recSection.innerHTML = `
+    <div class="timeline-title">
+      🧠 RECOMMENDED FOR YOU
+    </div>
+  `;
+
+  recommended.forEach((item) => {
+
+    recSection.appendChild(
+      createCard(item, {
+        showToast: (message) =>
+          showToast(toast, message),
+
+        load,
+        render,
+        data,
+      })
+    );
+
+  });
+
+  list.appendChild(recSection);
+}
 
   Object.entries(groups).forEach(([title, items]) => {
     if (!items.length) return;
