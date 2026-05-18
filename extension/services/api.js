@@ -66,3 +66,10 @@ export async function incrementCopyApi(id) {
     method: "PATCH",
   });
 }
+
+export async function fetchTrendingClips() {
+
+  return request(
+    `${API_BASE_URL}/clips/trending`
+  );
+}

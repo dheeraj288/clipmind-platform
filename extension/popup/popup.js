@@ -1,7 +1,10 @@
 import { createCard } from "./components/ClipCard.js";
 import { groupItems } from "./utils/groupItems.js";
 import { sortData } from "./utils/smartScore.js";
-import { fetchClips } from "../services/api.js";
+import {
+  fetchClips,
+  fetchTrendingClips,
+} from "../services/api.js";
 import { getToken, logoutUser } from "../services/auth.js";
 import { renderAuth } from "./authView.js";
 import { showToast } from "./utils/showToast.js";
@@ -111,26 +114,108 @@ document.querySelectorAll(".tab").forEach((tab) => {
   });
 });
 
+/* TRENDING */
+async function loadTrending() {
+
+  try {
+
+    const trending =
+      await fetchTrendingClips();
+
+    if (
+      !Array.isArray(trending) ||
+      !trending.length
+    ) {
+      return;
+    }
+
+    /* REMOVE OLD */
+    document
+      .querySelector(
+        ".trending-section"
+      )
+      ?.remove();
+
+    const section =
+      document.createElement("div");
+
+    section.className =
+      "timeline-section trending-section";
+
+    section.innerHTML = `
+      <div class="timeline-title">
+        🔥 TRENDING
+      </div>
+    `;
+
+    trending.forEach((item) => {
+
+      section.appendChild(
+        createCard(item, {
+          showToast: (message) =>
+            showToast(toast, message),
+
+          load,
+          render,
+          data,
+        })
+      );
+    });
+
+    list.prepend(section);
+
+  } catch (err) {
+
+    console.error(
+      "Trending error:",
+      err
+    );
+  }
+}
+
 /* INIT */
 async function init() {
-  const token = await getToken();
+
+  const token =
+    await getToken();
 
   if (!token) {
-    app.classList.add("hidden");
 
-    renderAuth(authContainer, async () => {
-      authContainer.innerHTML = "";
-      app.classList.remove("hidden");
+    app.classList.add(
+      "hidden"
+    );
 
-      await load();
-      setupLogout();
-    });
+    renderAuth(
+      authContainer,
+
+      async () => {
+
+        authContainer.innerHTML =
+          "";
+
+        app.classList.remove(
+          "hidden"
+        );
+
+        await load();
+
+        await loadTrending();
+
+        setupLogout();
+      }
+    );
 
     return;
   }
 
-  app.classList.remove("hidden");
+  app.classList.remove(
+    "hidden"
+  );
+
   await load();
+
+  await loadTrending();
+
   setupLogout();
 }
 

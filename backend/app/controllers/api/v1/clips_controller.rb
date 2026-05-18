@@ -144,6 +144,18 @@ def increment_copy
   }
 end
 
+
+def trending
+
+  clips = current_user
+            .clips
+            .active
+            .trending
+            .limit(10)
+
+  render json: clips
+end
+
   private
 
   def set_clip

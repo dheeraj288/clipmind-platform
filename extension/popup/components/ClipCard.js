@@ -89,6 +89,16 @@ export function createCard(
       ${getBadge(type)}
     </div>
 
+    ${
+        item.trending_rank
+          ? `
+            <div class="trend-rank">
+              🔥 Trending #${item.trending_rank}
+            </div>
+          `
+          : ""
+      }
+
     <div class="actions">
 
       <button
@@ -399,7 +409,16 @@ export function createCard(
       item.last_copied_at =
         new Date().toISOString();
 
-      render(data);
+      const countEl =
+        card.querySelector(
+          ".copy-count"
+        );
+
+      if (countEl) {
+
+        countEl.innerHTML =
+          `📋 ${item.copy_count}`;
+      }
 
     } catch {
 

@@ -7,7 +7,6 @@ before_create :set_defaults
   has_many :clip_copy_logs, dependent: :destroy
 
   scope :most_used, -> { order(copy_count: :desc) }
-  scope :trending, -> { order(copy_count: :desc).limit(10) }
 
   validates :content, presence: true
 
@@ -15,8 +14,30 @@ before_create :set_defaults
     where(deleted_at: nil)
   }
 
-  scope :most_used, -> { order(copy_count: :desc) }
-  scope :trending, -> { order(copy_count: :desc).limit(10) }
+  scope :active, -> {
+      where(deleted_at: nil)
+    }
+
+    scope :trending, -> {
+
+      left_joins(:clip_copy_logs)
+        .group("clips.id")
+        .order(
+          Arel.sql(
+            "
+              COUNT(
+                CASE
+                  WHEN clip_copy_logs.created_at >= NOW() - INTERVAL '7 days'
+                  THEN 1
+                END
+              ) * 5
+              +
+              clips.copy_count * 2 DESC
+            "
+          )
+        )
+
+    }
 
    enum clip_type: {
     text: "text",

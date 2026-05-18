@@ -10,6 +10,9 @@ Rails.application.routes.draw do
           patch :toggle_favorite
           patch :increment_copy
         end
+        collection do
+          get :trending
+        end
       end
     end
   end
