@@ -1,28 +1,87 @@
 export function groupItems(items) {
+
   const groups = {
-    today: [],
-    yesterday: [],
-    thisWeek: [],
-    older: [],
+    favorites: [],
+    frequent: [],
+    code: [],
+    links: [],
+    recent: [],
+    others: [],
   };
 
-  const now = new Date();
-  const oneDay = 1000 * 60 * 60 * 24;
+  const now = Date.now();
 
   items.forEach((item) => {
-    const created = new Date(item.created_at);
-    const diff = now - created;
 
-    if (created.toDateString() === now.toDateString()) {
-      groups.today.push(item);
-    } else if (diff < oneDay * 2) {
-      groups.yesterday.push(item);
-    } else if (diff < oneDay * 7) {
-      groups.thisWeek.push(item);
-    } else {
-      groups.older.push(item);
+    const createdAt =
+      new Date(item.created_at).getTime();
+
+    const hoursAgo =
+      (now - createdAt) /
+      (1000 * 60 * 60);
+
+    /* FAVORITES */
+    if (item.is_favorite) {
+
+      groups.favorites.push(item);
+
+      return;
     }
+
+    /* FREQUENTLY USED */
+    if ((item.copy_count || 0) >= 5) {
+
+      groups.frequent.push(item);
+
+      return;
+    }
+
+    /* CODE */
+    if (item.clip_type === "code") {
+
+      groups.code.push(item);
+
+      return;
+    }
+
+    /* LINKS */
+    if (item.clip_type === "link") {
+
+      groups.links.push(item);
+
+      return;
+    }
+
+    /* RECENT */
+    if (hoursAgo <= 24) {
+
+      groups.recent.push(item);
+
+      return;
+    }
+
+    /* OTHERS */
+    groups.others.push(item);
+
   });
 
-  return groups;
+  return {
+    "⭐ Favorites":
+      groups.favorites,
+
+    "🔥 Frequently Used":
+      groups.frequent,
+
+    "💻 Code Snippets":
+      groups.code,
+
+    "🌐 Links":
+      groups.links,
+
+    "🕒 Recently Added":
+      groups.recent,
+
+    "📦 Others":
+      groups.others,
+  };
 }

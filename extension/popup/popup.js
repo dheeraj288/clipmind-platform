@@ -5,6 +5,8 @@ import {
   fetchClips,
   fetchTrendingClips,
 } from "../services/api.js";
+import { smartSearch }
+  from "./utils/smartSearch.js";
 import { getToken, logoutUser } from "../services/auth.js";
 import { renderAuth } from "./authView.js";
 import { showToast } from "./utils/showToast.js";
@@ -92,15 +94,22 @@ async function load() {
 }
 
 /* SEARCH */
-search?.addEventListener("input", (e) => {
-  const value = e.target.value.toLowerCase();
+search?.addEventListener(
+  "input",
+  (e) => {
 
-  const filtered = data.filter((item) =>
-    item.content?.toLowerCase().includes(value)
-  );
+    const query =
+      e.target.value;
 
-  render(filtered);
-});
+    const filtered =
+      smartSearch(
+        data,
+        query
+      );
+
+    render(filtered);
+  }
+);
 
 /* FILTER TABS */
 document.querySelectorAll(".tab").forEach((tab) => {
@@ -218,5 +227,30 @@ async function init() {
 
   setupLogout();
 }
+
+document
+  .querySelectorAll(".smart-chip")
+  .forEach((chip) => {
+
+    chip.addEventListener(
+      "click",
+      () => {
+
+        const query =
+          chip.dataset.smart;
+
+        search.value =
+          query;
+
+        const filtered =
+          smartSearch(
+            data,
+            query
+          );
+
+        render(filtered);
+      }
+    );
+  });
 
 init();

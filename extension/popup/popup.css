@@ -88,6 +88,45 @@ input{
   justify-content:space-between;
 }
 
+
+.smart-filters{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  margin:12px 0 16px;
+  padding-bottom:4px;
+}
+
+.smart-filters::-webkit-scrollbar{
+  display:none;
+}
+
+.smart-chip{
+  border:none;
+  outline:none;
+
+  padding:8px 14px;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,0.06);
+
+  color:#fff;
+
+  font-size:12px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  white-space:nowrap;
+
+  transition:.2s ease;
+}
+
+.smart-chip:hover{
+  background:rgba(255,255,255,0.12);
+  transform:translateY(-1px);
+}
 /* =========================
    HEADER
 ========================= */
