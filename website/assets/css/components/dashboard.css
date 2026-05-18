@@ -361,3 +361,39 @@
   font-size:14px;
   line-height:1.6;
 }
+
+
+/* TOAST */
+.web-toast{
+  position:fixed;
+  right:28px;
+  bottom:28px;
+
+  padding:13px 18px;
+
+  border-radius:999px;
+
+  background:rgba(15,23,42,.92);
+  color:white;
+
+  border:1px solid var(--border-soft);
+
+  font-size:14px;
+  font-weight:800;
+
+  box-shadow:var(--shadow-soft);
+
+  opacity:0;
+  transform:translateY(12px);
+
+  pointer-events:none;
+
+  transition:.25s ease;
+
+  z-index:999;
+}
+
+.web-toast.show{
+  opacity:1;
+  transform:translateY(0);
+}

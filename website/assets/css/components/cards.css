@@ -232,3 +232,36 @@
   font-size:12px;
   font-weight:800;
 }
+
+
+/* CODE PREVIEW */
+.web-code-block{
+  max-height:220px;
+
+  margin:0;
+  padding:16px;
+
+  overflow:auto;
+
+  border-radius:16px;
+
+  background:#020617;
+  border:1px solid rgba(255,255,255,.08);
+
+  color:#dbeafe;
+
+  font-family:
+    "JetBrains Mono",
+    "Fira Code",
+    monospace;
+
+  font-size:13px;
+  line-height:1.7;
+
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.web-code-block code{
+  font-family:inherit;
+}

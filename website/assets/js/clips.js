@@ -1,4 +1,8 @@
 import {
+  showToast
+} from "./toast.js";
+
+import {
   fetchClips,
   getToken,
   logout,
@@ -59,9 +63,19 @@ function renderClips(items = []) {
           </span>
         </div>
 
-        <div class="clip-content">
-          ${escapeHtml(clip.content || "")}
-        </div>
+        ${
+          clip.clip_type === "code"
+            ? `
+              <pre class="web-code-block"><code>${escapeHtml(
+                clip.content || ""
+              )}</code></pre>
+            `
+            : `
+              <div class="clip-content">
+                ${escapeHtml(clip.content || "")}
+              </div>
+            `
+        }
 
         <div class="web-card-actions">
 
@@ -143,6 +157,7 @@ list.addEventListener(
 
       const res =
         await incrementCopy(copyId);
+        showToast("Copied ✔");
 
       clip.copy_count =
         res.copy_count;
@@ -154,12 +169,14 @@ list.addEventListener(
 
     if (favId) {
       await toggleFavorite(favId);
+      showToast("Favorite updated ⭐");
       await loadClips();
       return;
     }
 
     if (deleteId) {
       await deleteClip(deleteId);
+      showToast("Deleted 🗑");
       await loadClips();
     }
   }

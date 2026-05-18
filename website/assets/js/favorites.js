@@ -69,11 +69,19 @@ function renderFavorites(items = []) {
 
         </div>
 
-        <div class="clip-content">
-          ${escapeHtml(
-            clip.content || ""
-          )}
-        </div>
+        ${
+          clip.clip_type === "code"
+            ? `
+              <pre class="web-code-block"><code>${escapeHtml(
+                clip.content || ""
+              )}</code></pre>
+            `
+            : `
+              <div class="clip-content">
+                ${escapeHtml(clip.content || "")}
+              </div>
+            `
+        }
 
         <div class="web-card-actions">
 
