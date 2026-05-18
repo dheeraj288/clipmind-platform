@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  root "dashboard#index"
+  get "dashboard", to: "dashboard#index"
   namespace :api do
     namespace :v1 do
       post :signup, to: 'auth#signup'

@@ -11,10 +11,6 @@ before_create :set_defaults
   validates :content, presence: true
 
   scope :active, -> {
-    where(deleted_at: nil)
-  }
-
-  scope :active, -> {
       where(deleted_at: nil)
     }
 

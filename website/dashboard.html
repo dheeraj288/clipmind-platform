@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>ClipMind Dashboard</title>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/style.css"
+  />
+
+</head>
+
+<body>
+
+  <main class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <div>
+
+        <div class="brand">
+          🧠 ClipMind
+        </div>
+
+        <nav class="menu">
+
+          <button class="menu-item active">
+            Dashboard
+          </button>
+
+          <a href="clips.html" class="menu-item">
+			 All Clips
+		  </a>
+
+          <button class="menu-item">
+            Favorites
+          </button>
+
+          <button class="menu-item">
+            Trending
+          </button>
+
+          <button class="menu-item">
+            AI Memory
+          </button>
+
+        </nav>
+
+      </div>
+
+      <button
+        id="logout-btn"
+        class="logout-btn"
+      >
+        Logout
+      </button>
+
+    </aside>
+
+    <!-- CONTENT -->
+    <section class="content">
+
+      <header class="hero-section">
+
+		  <div>
+		    <p class="hero-label">
+		      AI Clipboard Workspace
+		    </p>
+
+		    <h1>
+		      Your smart clipboard,
+		      <span>organized by AI.</span>
+		    </h1>
+
+		    <p class="hero-subtitle">
+		      Track, search, and reuse your most important clips from one powerful dashboard.
+		    </p>
+		  </div>
+
+		  <div class="hero-actions">
+
+		    <a
+		      href="clips.html"
+		      class="hero-btn primary"
+		    >
+		      View Clips
+		    </a>
+
+		    <button class="hero-btn secondary">
+		      AI Memory
+		    </button>
+
+		  </div>
+
+	  </header>
+
+      <!-- STATS -->
+      <section class="stats-grid">
+
+		  <div class="stat-card stat-purple">
+		    <div class="stat-icon">📋</div>
+		    <h3>Total Clips</h3>
+		    <p id="total-clips">0</p>
+		  </div>
+
+		  <div class="stat-card stat-pink">
+		    <div class="stat-icon">⭐</div>
+		    <h3>Favorites</h3>
+		    <p id="favorite-clips">0</p>
+		  </div>
+
+		  <div class="stat-card stat-blue">
+		    <div class="stat-icon">🔥</div>
+		    <h3>Trending</h3>
+		    <p id="trending-count">0</p>
+		  </div>
+
+	  </section>
+
+	  	<section class="insights-grid">
+
+		  <div class="insight-card glow-purple">
+		    <div class="insight-icon">🧠</div>
+
+		    <div>
+		      <h3>AI Memory</h3>
+		      <p>Your most useful clips are learning from copy behavior.</p>
+		    </div>
+		  </div>
+
+		  <div class="insight-card glow-blue">
+		    <div class="insight-icon">⚡</div>
+
+		    <div>
+		      <h3>Smart Search</h3>
+		      <p>Find clips by meaning, type, usage, favorites, and recency.</p>
+		    </div>
+		  </div>
+
+		  <div class="insight-card glow-pink">
+		    <div class="insight-icon">🔥</div>
+
+		    <div>
+		      <h3>Trending Engine</h3>
+		      <p>Recently used and popular clips automatically rise to the top.</p>
+		    </div>
+		  </div>
+
+		</section>
+
+		<section class="quick-actions-grid">
+
+		  <a href="clips.html" class="quick-action-card purple">
+		    <div class="quick-icon">📋</div>
+
+		    <div>
+		      <h3>Manage Clips</h3>
+		      <p>View, copy, favorite, and delete all saved clips.</p>
+		    </div>
+		  </a>
+
+		  <a href="clips.html" class="quick-action-card blue">
+		    <div class="quick-icon">🔍</div>
+
+		    <div>
+		      <h3>Search Workspace</h3>
+		      <p>Find clips by content, type, favorites, and usage.</p>
+		    </div>
+		  </a>
+
+		  <a href="clips.html" class="quick-action-card pink">
+		    <div class="quick-icon">🧠</div>
+
+		    <div>
+		      <h3>AI Memory</h3>
+		      <p>Discover important clips based on your behavior.</p>
+		    </div>
+		  </a>
+
+		</section>
+
+      <!-- TRENDING -->
+      <section class="dashboard-section">
+
+        <div class="section-title">
+          🔥 Trending Clips
+        </div>
+
+        <div id="trending-list"></div>
+
+      </section>
+
+    </section>
+
+  </main>
+
+  <script
+    type="module"
+    src="assets/js/dashboard.js"
+  ></script>
+
+</body>
+</html>

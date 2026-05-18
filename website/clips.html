@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>ClipMind - All Clips</title>
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+
+<body>
+  <main class="dashboard">
+
+    <aside class="sidebar">
+      <div>
+        <div class="brand">🧠 ClipMind</div>
+
+        <nav class="menu">
+          <a href="dashboard.html" class="menu-item">Dashboard</a>
+          <a href="clips.html" class="menu-item active">All Clips</a>
+          <button class="menu-item">Favorites</button>
+          <button class="menu-item">Trending</button>
+          <button class="menu-item">AI Memory</button>
+        </nav>
+      </div>
+
+      <button id="logout-btn" class="logout-btn">
+        Logout
+      </button>
+    </aside>
+
+    <section class="content">
+
+      <header class="topbar">
+        <h1>All Clips</h1>
+      </header>
+
+      <div class="web-search-box">
+        <input
+          id="clip-search"
+          type="text"
+          placeholder="Search clips..."
+          autocomplete="off"
+        />
+      </div>
+
+      <section class="dashboard-section">
+        <div class="section-title">📋 Your Clips</div>
+
+        <div id="clips-list"></div>
+      </section>
+
+    </section>
+  </main>
+
+  <script type="module" src="assets/js/clips.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+:root{
+  --bg-main:#070814;
+  --bg-panel:#0d1020;
+  --bg-card:#111528;
+  --bg-card-soft:#151a31;
+
+  --border-soft:rgba(255,255,255,.08);
+  --border-strong:rgba(255,255,255,.14);
+
+  --text-main:#f8fafc;
+  --text-muted:#94a3b8;
+  --text-soft:#cbd5e1;
+
+  --purple:#a855f7;
+  --purple-dark:#7c3aed;
+  --pink:#ec4899;
+  --blue:#0ea5e9;
+  --green:#22c55e;
+  --red:#ef4444;
+
+  --gradient-purple:linear-gradient(135deg,#7c3aed,#d946ef);
+  --gradient-blue:linear-gradient(135deg,#0ea5e9,#4f46e5);
+  --gradient-green:linear-gradient(135deg,#22c55e,#06b6d4);
+  --gradient-pink:linear-gradient(135deg,#ec4899,#f43f5e);
+
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:22px;
+  --radius-xl:28px;
+
+  --shadow-soft:0 20px 60px rgba(0,0,0,.35);
+  --sidebar-width:260px;
+}
