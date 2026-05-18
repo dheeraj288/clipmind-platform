@@ -1,23 +1,14 @@
-import {
-  fetchClips,
-  deleteClipApi,
-  toggleFavoriteApi,
-  incrementCopyApi,
-} from "../services/api.js";
-
-import {
-  getToken,
-  logoutUser,
-} from "../services/auth.js";
-
-import {
-  renderAuth,
-} from "./authView.js";
+import { createCard } from "./components/ClipCard.js";
+import { groupItems } from "./utils/groupItems.js";
+import { sortData } from "./utils/smartScore.js";
+import { fetchClips } from "../services/api.js";
+import { getToken, logoutUser } from "../services/auth.js";
+import { renderAuth } from "./authView.js";
+import { showToast } from "./utils/showToast.js";
 
 /* ELEMENTS */
 const app = document.getElementById("app");
 const authContainer = document.getElementById("auth-container");
-
 const list = document.getElementById("list");
 const search = document.getElementById("search");
 const toast = document.getElementById("toast");
@@ -26,778 +17,120 @@ const toast = document.getElementById("toast");
 let data = [];
 let currentFilter = "all";
 
-/* HELPERS */
-const escapeHtml = (text = "") =>
-  text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-const safeTime = (item) =>
-  new Date(
-    item.created_at || Date.now()
-  ).toLocaleString();
-
-const showToast = (
-  message = "Copied ✔"
-) => {
-
-  toast.textContent = message;
-
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 1200);
-};
-
-const copyToClipboard = async (text) => {
-  await navigator.clipboard.writeText(text);
-};
-
-const getBadge = (type) => ({
-  code: "💻 CODE",
-  text: "📝 TEXT",
-  link: "🌐 LINK",
-  json: "📦 JSON",
-  email: "📧 EMAIL",
-  command: "⚡ COMMAND",
-}[type] || "📋 CLIP");
-
-const getSmartScore = (item) => {
-
-  let score = 0;
-
-  if (item.is_favorite) score += 1000;
-
-  score += (item.copy_count || 0) * 50;
-
-  const hoursAgo =
-    (Date.now() -
-      new Date(item.created_at)) /
-    (1000 * 60 * 60);
-
-    if (item.last_copied_at) {
-
-      const copiedAgo =
-        (Date.now() -
-          new Date(item.last_copied_at)) /
-        (1000 * 60);
-
-      if (copiedAgo < 2) {
-        score += 5000;
-      }
-    }
-
-  if (hoursAgo < 1) score += 500;
-  else if (hoursAgo < 6) score += 300;
-  else if (hoursAgo < 24) score += 100;
-  else if (hoursAgo < 72) score += 50;
-
-  if (item.clip_type === "code") score += 200;
-  if (item.clip_type === "link") score += 150;
-
-  return score;
-};
-
-const sortData = (items) =>
-  [...items].sort(
-    (a, b) =>
-      getSmartScore(b) -
-      getSmartScore(a)
-  );
-
+/* FILTER */
 const filterData = (items) =>
   currentFilter === "all"
     ? items
-    : items.filter(
-        (i) =>
-          i.clip_type ===
-          currentFilter
-      );
+    : items.filter((i) => i.clip_type === currentFilter);
 
 /* LOGOUT */
 function setupLogout() {
-
-  const logoutBtn =
-    document.getElementById(
-      "logout-btn"
-    );
-
+  const logoutBtn = document.getElementById("logout-btn");
   if (!logoutBtn) return;
 
   logoutBtn.onclick = async () => {
-
     await logoutUser();
-
     location.reload();
   };
 }
 
-/* GROUPS */
-function groupItems(items) {
-
-  const groups = {
-    today: [],
-    yesterday: [],
-    thisWeek: [],
-    older: [],
-  };
-
-  const now = new Date();
-
-  const oneDay =
-    1000 * 60 * 60 * 24;
-
-  items.forEach((item) => {
-
-    const created =
-      new Date(item.created_at);
-
-    const diff = now - created;
-
-    if (
-      created.toDateString() ===
-      now.toDateString()
-    ) {
-      groups.today.push(item);
-
-    } else if (
-      diff < oneDay * 2
-    ) {
-      groups.yesterday.push(item);
-
-    } else if (
-      diff < oneDay * 7
-    ) {
-      groups.thisWeek.push(item);
-
-    } else {
-      groups.older.push(item);
-    }
-  });
-
-  return groups;
-}
-
-/* CARD */
-function createCard(item) {
-
-  const card =
-    document.createElement("div");
-
-  card.className = "card";
-
-  const type =
-    item.clip_type || "text";
-
-  const hostname = (() => {
-
-    try {
-
-      return item.source_url
-        ? new URL(item.source_url)
-            .hostname
-        : "";
-
-    } catch {
-
-      return "";
-    }
-  })();
-
-  const favicon = hostname
-    ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`
-    : "";
-
-  const pageTitle =
-    item.page_title ||
-    hostname ||
-    "Unknown Source";
-
-  /* YOUTUBE THUMB */
-  let youtubeThumb = "";
-
-  if (
-    item.source_url &&
-    item.source_url.includes("youtube.com")
-  ) {
-
-    try {
-
-      const url =
-        new URL(item.source_url);
-
-      const videoId =
-        url.searchParams.get("v");
-
-      if (videoId) {
-
-        youtubeThumb =
-          `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-      }
-
-    } catch {}
-  }
-
-  /* LONG TEXT */
-  const isLong =
-    item.content &&
-    item.content.length > 220;
-
-  card.innerHTML = `
-
-    <div class="card-glow"></div>
-
-    <div class="badge">
-      ${getBadge(type)}
-    </div>
-
-    <div class="actions">
-
-      <button
-        class="icon-btn delete"
-        data-delete="${item.id}"
-      >
-        ✕
-      </button>
-
-      <button
-        class="icon-btn pin"
-        data-fav="${item.id}"
-      >
-        ${
-          item.is_favorite
-            ? "⭐"
-            : "☆"
-        }
-      </button>
-
-    </div>
-
-    <div class="meta">
-
-      ${
-        youtubeThumb
-          ? `
-          <img
-            src="${youtubeThumb}"
-            class="yt-thumb"
-          />
-        `
-          : ""
-      }
-
-      <div class="meta-left">
-
-        ${
-          favicon
-            ? `
-            <img
-              src="${favicon}"
-              class="favicon"
-            />
-          `
-            : ""
-        }
-
-        <div class="meta-info">
-
-          <div class="meta-title">
-
-            ${
-              item.source_url
-                ? `
-                <a
-                  href="${item.source_url}"
-                  target="_blank"
-                  class="title-link"
-                >
-                  ${escapeHtml(pageTitle)}
-                </a>
-              `
-                : escapeHtml(pageTitle)
-            }
-
-          </div>
-
-          ${
-            hostname
-              ? `
-              <div class="meta-domain">
-                ${hostname}
-              </div>
-            `
-              : ""
-          }
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="content ${
-      type === "code"
-        ? "code"
-        : ""
-    }">
-
-      ${
-        type === "link"
-
-          ? `
-          <a
-            href="${item.content}"
-            target="_blank"
-            class="clip-link"
-          >
-            🔗 ${item.content}
-          </a>
-        `
-
-          : `
-
-          ${
-            type === "code"
-              ? `
-              <div class="code-wrapper">
-
-                <div class="code-header">
-
-                  <div class="lang-badge">
-                    ${item.language || "CODE"}
-                  </div>
-
-                  ${
-                    item.content.length > 300
-                      ? `
-                      <button class="expand-btn code-expand-btn">
-                        See More
-                      </button>
-                    `
-                      : ""
-                  }
-
-                </div>
-
-                <pre class="code-block ${
-                  item.content.length > 300
-                    ? "collapsed-code"
-                    : ""
-                }">
-            <code>${escapeHtml(item.content)}</code>
-                </pre>
-
-
-              </div>
-            `
-
-              : `
-              <div class="text-content">
-
-                <div class="clip-text ${
-                  isLong ? "clamped" : ""
-                }">
-                  ${escapeHtml(item.content)}
-                </div>
-
-                ${
-                  isLong
-                    ? `
-                    <button class="text-expand-btn">
-                      See More
-                    </button>
-                  `
-                    : ""
-                }
-
-              </div>
-            `
-          }
-        `
-      }
-
-    </div>
-
-    <div class="time">
-
-      <span>
-        ${safeTime(item)}
-      </span>
-
-      <span class="copy-count">
-        📋 ${item.copy_count || 0}
-      </span>
-
-    </div>
-  `;
-
-/* TEXT EXPAND */
-
-        // ===== TEXT EXPAND =====
-
-const textExpandBtn =
-  card.querySelector(
-    ".text-expand-btn"
-  );
-
-const clipText =
-  card.querySelector(
-    ".clip-text"
-  );
-
-textExpandBtn?.addEventListener(
-  "click",
-  (e) => {
-
-    e.stopPropagation();
-
-    const expanded =
-      clipText.classList.contains(
-        "expanded"
-      );
-
-    if (expanded) {
-
-      clipText.classList.remove(
-        "expanded"
-      );
-
-      clipText.classList.add(
-        "clamped"
-      );
-
-      textExpandBtn.textContent =
-        "See More";
-
-    } else {
-
-      clipText.classList.remove(
-        "clamped"
-      );
-
-      clipText.classList.add(
-        "expanded"
-      );
-
-      textExpandBtn.textContent =
-        "See Less";
-    }
-  }
-);
-
-// ===== CODE EXPAND =====
-
-const codeExpandBtn =
-  card.querySelector(
-    ".code-expand-btn"
-  );
-
-const codeBlock =
-  card.querySelector(
-    ".code-block"
-  );
-
-codeExpandBtn?.addEventListener(
-  "click",
-  (e) => {
-
-    e.stopPropagation();
-
-    const expanded =
-      codeBlock.classList.contains(
-        "expanded-code"
-      );
-
-    if (expanded) {
-
-      codeBlock.classList.remove(
-        "expanded-code"
-      );
-
-      codeBlock.classList.add(
-        "collapsed-code"
-      );
-
-      codeExpandBtn.textContent =
-        "See More";
-
-    } else {
-
-      codeBlock.classList.remove(
-        "collapsed-code"
-      );
-
-      codeBlock.classList.add(
-        "expanded-code"
-      );
-
-      codeExpandBtn.textContent =
-        "See Less";
-    }
-  }
-);
-  /* COPY CODE */
-  const copyCodeBtn =
-    card.querySelector(
-      ".copy-code-btn"
-    );
-
-  copyCodeBtn?.addEventListener(
-    "click",
-
-    async (e) => {
-
-      e.stopPropagation();
-
-      await copyToClipboard(
-        item.content
-      );
-
-      showToast(
-        "Code copied ✔"
-      );
-    }
-  );
-
-  /* COPY CARD */
-  card.onclick = async () => {
-
-    try {
-
-      await copyToClipboard(
-        item.content
-      );
-
-      card.classList.add(
-        "copied"
-      );
-
-      setTimeout(() => {
-
-        card.classList.remove(
-          "copied"
-        );
-
-      }, 300);
-
-      showToast();
-
-      const res =
-        await incrementCopyApi(
-          item.id
-        );
-
-      item.copy_count =
-        res.copy_count;
-
-        item.last_copied_at = new Date().toISOString();
-
-      render(data);
-
-    } catch {
-
-      showToast(
-        "Copy failed ❌"
-      );
-    }
-  };
-
-  /* DELETE */
-  card
-    .querySelector("[data-delete]")
-    .onclick = async (e) => {
-
-      e.stopPropagation();
-
-      await deleteClipApi(
-        item.id
-      );
-
-      await load();
-    };
-
-  /* FAVORITE */
-  card
-    .querySelector("[data-fav]")
-    .onclick = async (e) => {
-
-      e.stopPropagation();
-
-      await toggleFavoriteApi(
-        item.id
-      );
-
-      await load();
-    };
-
-  return card;
-}
-
 /* RENDER */
 function render(items = []) {
-
   list.innerHTML = "";
 
-  const finalData =
-    filterData(
-      sortData(items)
-    );
+  const finalData = filterData(sortData(items));
 
   if (!finalData.length) {
-
-    list.innerHTML = `
-      <div class="empty">
-        No clips found 🚀
-      </div>
-    `;
-
+    list.innerHTML = `<div class="empty">No clips found 🚀</div>`;
     return;
   }
 
-  const groups =
-    groupItems(finalData);
+  const groups = groupItems(finalData);
 
-  Object.entries(groups).forEach(
-    ([title, items]) => {
+  Object.entries(groups).forEach(([title, items]) => {
+    if (!items.length) return;
 
-      if (!items.length) return;
+    const section = document.createElement("div");
+    section.className = "timeline-section";
 
-      const section =
-        document.createElement(
-          "div"
-        );
+    section.innerHTML = `
+      <div class="timeline-title">
+        ${title.toUpperCase()}
+      </div>
+    `;
 
-      section.className =
-        "timeline-section";
+    items.forEach((item) => {
+      section.appendChild(
+        createCard(item, {
+          showToast: (message) => showToast(toast, message),
+          load,
+          render,
+          data,
+        })
+      );
+    });
 
-      section.innerHTML = `
-        <div class="timeline-title">
-          ${title.toUpperCase()}
-        </div>
-      `;
-
-      items.forEach((item) => {
-        section.appendChild(
-          createCard(item)
-        );
-      });
-
-      list.appendChild(section);
-    }
-  );
+    list.appendChild(section);
+  });
 }
 
 /* LOAD */
 async function load() {
-
   try {
+    const response = await fetchClips();
 
-    const response =
-      await fetchClips();
-
-    data =
-      Array.isArray(response)
-        ? response
-        : [];
+    data = Array.isArray(response) ? response : [];
 
     render(data);
-
   } catch (error) {
-
     console.error(error);
-
-    list.innerHTML = `
-      <div class="empty">
-        Failed to load clips ❌
-      </div>
-    `;
+    list.innerHTML = `<div class="empty">Failed to load clips ❌</div>`;
   }
 }
 
 /* SEARCH */
-search?.addEventListener(
-  "input",
+search?.addEventListener("input", (e) => {
+  const value = e.target.value.toLowerCase();
 
-  (e) => {
+  const filtered = data.filter((item) =>
+    item.content?.toLowerCase().includes(value)
+  );
 
-    const value =
-      e.target.value.toLowerCase();
-
-    const filtered =
-      data.filter((item) =>
-        item.content
-          ?.toLowerCase()
-          .includes(value)
-      );
-
-    render(filtered);
-  }
-);
+  render(filtered);
+});
 
 /* FILTER TABS */
-document
-  .querySelectorAll(".tab")
-  .forEach((tab) => {
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((b) => b.classList.remove("active"));
 
-    tab.addEventListener(
-      "click",
+    tab.classList.add("active");
+    currentFilter = tab.dataset.type;
 
-      () => {
-
-        document
-          .querySelectorAll(".tab")
-          .forEach((b) =>
-            b.classList.remove(
-              "active"
-            )
-          );
-
-        tab.classList.add(
-          "active"
-        );
-
-        currentFilter =
-          tab.dataset.type;
-
-        render(data);
-      }
-    );
+    render(data);
   });
+});
 
 /* INIT */
 async function init() {
-
-  const token =
-    await getToken();
+  const token = await getToken();
 
   if (!token) {
-
     app.classList.add("hidden");
 
-    renderAuth(
-      authContainer,
+    renderAuth(authContainer, async () => {
+      authContainer.innerHTML = "";
+      app.classList.remove("hidden");
 
-      async () => {
-
-        authContainer.innerHTML = "";
-
-        app.classList.remove("hidden");
-
-        await load();
-
-        setupLogout();
-      }
-    );
+      await load();
+      setupLogout();
+    });
 
     return;
   }
 
   app.classList.remove("hidden");
-
   await load();
-
   setupLogout();
 }
 
