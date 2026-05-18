@@ -9,7 +9,7 @@
     content="width=device-width, initial-scale=1.0"
   />
 
-  <title>ClipMind - All Clips</title>
+  <title>ClipMind - Favorites</title>
 
   <link
     rel="stylesheet"
@@ -36,11 +36,11 @@
             Dashboard
           </a>
 
-          <a href="clips.html" class="menu-item active">
+          <a href="clips.html" class="menu-item">
             All Clips
           </a>
 
-          <a href="favorites.html" class="menu-item">
+          <a href="favorites.html" class="menu-item active">
             Favorites
           </a>
 
@@ -72,40 +72,29 @@
         <div>
 
           <p class="hero-label">
-            Smart Workspace
+            Saved Clips
           </p>
 
           <h1>
-            Manage all your
-            <span>saved clips.</span>
+            Your favorite
+            <span>clips.</span>
           </h1>
 
           <p class="hero-subtitle">
-            Search, organize, copy, and manage your clipboard history.
+            Quickly access the clips you marked as important.
           </p>
 
         </div>
 
       </header>
 
-      <div class="web-search-box">
-
-        <input
-          id="clip-search"
-          type="text"
-          placeholder="Search clips..."
-          autocomplete="off"
-        />
-
-      </div>
-
       <section class="dashboard-section">
 
         <div class="section-title">
-          📋 Your Clips
+          ⭐ Favorites
         </div>
 
-        <div id="clips-list"></div>
+        <div id="favorites-list"></div>
 
       </section>
 
@@ -115,7 +104,7 @@
 
   <script
     type="module"
-    src="assets/js/clips.js"
+    src="assets/js/favorites.js"
   ></script>
 
 </body>
