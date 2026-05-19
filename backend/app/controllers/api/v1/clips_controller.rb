@@ -68,7 +68,8 @@ end
     clip = current_user.clips.new(
       clip_params.merge(
         clip_type: detection[:clip_type],
-        language: detection[:language]
+        language: detection[:language],
+        deleted_at: nil
       )
     )
 

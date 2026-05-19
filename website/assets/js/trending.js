@@ -35,6 +35,23 @@ function escapeHtml(text = "") {
     .replace(/>/g, "&gt;");
 }
 
+function getCodeLanguage(clip) {
+  const language =
+    clip.language ||
+    clip.clip_type ||
+    "javascript";
+
+  if (language === "ruby") return "ruby";
+  if (language === "javascript") return "javascript";
+  if (language === "js") return "javascript";
+  if (language === "css") return "css";
+  if (language === "html") return "markup";
+  if (language === "erb") return "markup";
+  if (language === "json") return "javascript";
+
+  return "javascript";
+}
+
 function renderTrending(items = []) {
 
   if (!items.length) {
@@ -71,7 +88,9 @@ function renderTrending(items = []) {
         ${
           clip.clip_type === "code"
             ? `
-              <pre class="web-code-block"><code>${escapeHtml(
+              <pre class="web-code-block"><code class="language-${getCodeLanguage(
+                clip
+              )}">${escapeHtml(
                 clip.content || ""
               )}</code></pre>
             `
@@ -111,6 +130,9 @@ function renderTrending(items = []) {
       </div>
 
     `).join("");
+    if (window.Prism) {
+    Prism.highlightAllUnder(list);
+  }
 }
 
 async function loadTrending() {

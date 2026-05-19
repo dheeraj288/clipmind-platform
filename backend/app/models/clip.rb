@@ -48,6 +48,7 @@ before_create :set_defaults
   def set_defaults
     self.copy_count ||= 0
     self.is_favorite ||= false
+    self.deleted_at = nil
   end
 
 end
