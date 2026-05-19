@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_19_132129) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_19_190230) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,8 +40,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_19_132129) do
     t.string "page_title"
     t.integer "copy_count", default: 0, null: false
     t.bigint "collection_id"
+    t.jsonb "tags", default: [], null: false
     t.index ["collection_id"], name: "index_clips_on_collection_id"
     t.index ["copy_count"], name: "index_clips_on_copy_count"
+    t.index ["tags"], name: "index_clips_on_tags", using: :gin
     t.index ["user_id"], name: "index_clips_on_user_id"
   end
 

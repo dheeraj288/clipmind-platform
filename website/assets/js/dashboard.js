@@ -114,6 +114,20 @@ function renderTrending(clips) {
             `
         }
 
+          ${
+            clip.tags && clip.tags.length
+              ? `
+                <div class="tag-list">
+                  ${clip.tags.map((tag) => `
+                    <span class="tag-pill">
+                      #${escapeHtml(tag)}
+                    </span>
+                  `).join("")}
+                </div>
+              `
+              : ""
+          }
+
         <div class="trend-footer">
 
           <span class="copy-count-pill">

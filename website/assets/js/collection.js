@@ -180,6 +180,20 @@ function renderClips(items = []) {
             `
         }
 
+         ${
+          clip.tags && clip.tags.length
+            ? `
+              <div class="tag-list">
+                ${clip.tags.map((tag) => `
+                  <span class="tag-pill">
+                    #${escapeHtml(tag)}
+                  </span>
+                `).join("")}
+              </div>
+            `
+            : ""
+        }   
+
         <div class="web-card-actions">
 
           <button

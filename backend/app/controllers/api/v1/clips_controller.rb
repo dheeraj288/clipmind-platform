@@ -75,16 +75,23 @@ end
 
     if clip.save
 
-        AutoCollectionService
-          .new(
-            user: current_user,
-            clip: clip
-          )
+      AutoCollectionService
+        .new(
+          user: current_user,
+          clip: clip
+        )
+        .call
+
+      clip.reload
+
+      clip.update!(
+        tags: SmartTagService
+          .new(clip)
           .call
+      )
 
-        render json: clip,
-               status: :created
-
+      render json: clip,
+             status: :created
   
     else
       render json: {
