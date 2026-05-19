@@ -194,3 +194,9 @@ export async function updateClip(id, data) {
     }
   );
 }
+
+export async function fetchAiMemory() {
+  return request(
+    "/clips/ai_memory"
+  );
+}

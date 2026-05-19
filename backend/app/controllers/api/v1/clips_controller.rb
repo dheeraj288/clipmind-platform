@@ -163,6 +163,37 @@ def trending
   render json: clips
 end
 
+
+def ai_memory
+
+  clips =
+    current_user
+      .clips
+      .active
+
+  ranked_clips =
+    clips
+      .map do |clip|
+
+        score =
+          AiMemoryScoreService
+            .new(clip)
+            .call
+
+        clip
+          .as_json
+          .merge(
+            ai_score: score
+          )
+      end
+      .sort_by do |clip|
+        -clip[:ai_score]
+      end
+      .first(10)
+
+  render json: ranked_clips
+end
+
   private
 
   def set_clip

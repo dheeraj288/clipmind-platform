@@ -17,6 +17,7 @@ Rails.application.routes.draw do
         end
         collection do
           get :trending
+          get :ai_memory
         end
       end
     end

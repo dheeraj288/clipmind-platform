@@ -1,10 +1,14 @@
 import {
-  fetchClips,
+  fetchAiMemory,
   getToken,
   logout,
   toggleFavorite,
   incrementCopy,
 } from "./api.js";
+
+import {
+  showToast,
+} from "./toast.js";
 
 const list =
   document.getElementById(
@@ -33,37 +37,6 @@ function escapeHtml(text = "") {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-}
-
-function getMemoryScore(clip) {
-  let score = 0;
-
-  if (clip.is_favorite) {
-    score += 100;
-  }
-
-  score +=
-    (clip.copy_count || 0) * 10;
-
-  if (clip.clip_type === "code") {
-    score += 20;
-  }
-
-  if (clip.clip_type === "link") {
-    score += 8;
-  }
-
-  return score;
-}
-
-function getRecommendations(clips) {
-  return [...clips]
-    .sort(
-      (a, b) =>
-        getMemoryScore(b) -
-        getMemoryScore(a)
-    )
-    .slice(0, 10);
 }
 
 function getCodeLanguage(clip) {
@@ -111,7 +84,7 @@ function renderMemory(items = []) {
           </span>
 
           <span>
-            Score ${getMemoryScore(clip)}
+            Score ${clip.ai_score || 0}
           </span>
 
         </div>
@@ -162,7 +135,7 @@ function renderMemory(items = []) {
 
     `).join("");
 
-    if (window.Prism) {
+  if (window.Prism) {
     Prism.highlightAllUnder(list);
   }
 }
@@ -171,16 +144,8 @@ async function loadMemory() {
 
   try {
 
-    const response =
-      await fetchClips();
-
-    const clips =
-      Array.isArray(response)
-        ? response
-        : response.clips || [];
-
     memoryClips =
-      getRecommendations(clips);
+      await fetchAiMemory();
 
     renderMemory(
       memoryClips
@@ -228,6 +193,10 @@ list?.addEventListener(
         copyId
       );
 
+      showToast(
+        "Copied ✔"
+      );
+
       await loadMemory();
 
       return;
@@ -237,6 +206,10 @@ list?.addEventListener(
 
       await toggleFavorite(
         favId
+      );
+
+      showToast(
+        "Favorite updated ⭐"
       );
 
       await loadMemory();
