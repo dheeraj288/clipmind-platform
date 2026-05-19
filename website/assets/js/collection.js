@@ -5,8 +5,8 @@ import {
   deleteClip,
   incrementCopy,
   updateClip,
-  request,
 } from "./api.js";
+
 import {
   showToast,
 } from "./toast.js";
@@ -26,6 +26,8 @@ const logoutBtn =
     "logout-btn"
   );
 
+const API_BASE =
+  "http://localhost:3000/api/v1";
 
 const params =
   new URLSearchParams(
@@ -71,6 +73,69 @@ function getCodeLanguage(clip) {
   return "javascript";
 }
 
+function renderCodeBlock(clip) {
+  return `
+    <div class="web-code-wrapper">
+
+      <pre
+        class="web-code-block"
+        id="code-${clip.id}"
+      ><code class="language-${getCodeLanguage(clip)}">${escapeHtml(
+        clip.content || ""
+      )}</code></pre>
+
+      <div class="code-controls">
+
+        <button
+          class="code-btn"
+          data-toggle="${clip.id}"
+        >
+          Show More
+        </button>
+
+        <button
+          class="code-btn"
+          data-copy-code="${clip.id}"
+        >
+          Copy Code
+        </button>
+
+      </div>
+
+    </div>
+  `;
+}
+
+async function request(endpoint) {
+
+  const response =
+    await fetch(
+      `${API_BASE}${endpoint}`,
+      {
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          Authorization:
+            `Bearer ${getToken()}`,
+        },
+      }
+    );
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error ||
+      data.message ||
+      "API Error"
+    );
+  }
+
+  return data;
+}
+
 function renderClips(items = []) {
 
   if (!items.length) {
@@ -105,13 +170,7 @@ function renderClips(items = []) {
 
         ${
           clip.clip_type === "code"
-            ? `
-              <pre class="web-code-block"><code class="language-${getCodeLanguage(
-                  clip
-                )}">${escapeHtml(
-                  clip.content || ""
-                )}</code></pre>
-            `
+            ? renderCodeBlock(clip)
             : `
               <div class="clip-content">
                 ${escapeHtml(
@@ -160,7 +219,7 @@ function renderClips(items = []) {
       </div>
     `).join("");
 
-    if (window.Prism) {
+  if (window.Prism) {
     Prism.highlightAllUnder(list);
   }
 }
@@ -181,7 +240,6 @@ async function loadCollection() {
       await request(
         `/collections/${collectionId}`
       );
-      console.log("COLLECTION DATA:", data);
 
     title.innerHTML = `
       ${escapeHtml(data.collection.name)}
@@ -221,6 +279,57 @@ list?.addEventListener(
 
     const deleteId =
       e.target.dataset.delete;
+
+    const toggleId =
+      e.target.dataset.toggle;
+
+    const copyCodeId =
+      e.target.dataset.copyCode;
+
+    if (toggleId) {
+
+      const code =
+        document.getElementById(
+          `code-${toggleId}`
+        );
+
+      if (!code) return;
+
+      code.classList.toggle(
+        "expanded"
+      );
+
+      e.target.textContent =
+        code.classList.contains(
+          "expanded"
+        )
+          ? "Hide"
+          : "Show More";
+
+      return;
+    }
+
+    if (copyCodeId) {
+
+      const clip =
+        clips.find(
+          (item) =>
+            String(item.id) ===
+            String(copyCodeId)
+        );
+
+      if (!clip) return;
+
+      await navigator.clipboard.writeText(
+        clip.content || ""
+      );
+
+      showToast(
+        "Code copied ✔"
+      );
+
+      return;
+    }
 
     if (copyId) {
 

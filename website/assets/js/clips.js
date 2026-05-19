@@ -59,6 +59,39 @@ function getCodeLanguage(clip) {
   return "javascript";
 }
 
+function renderCodeBlock(clip) {
+  return `
+    <div class="web-code-wrapper">
+
+      <pre
+        class="web-code-block"
+        id="code-${clip.id}"
+      ><code class="language-${getCodeLanguage(clip)}">${escapeHtml(
+        clip.content || ""
+      )}</code></pre>
+
+      <div class="code-controls">
+
+        <button
+          class="code-btn"
+          data-toggle="${clip.id}"
+        >
+          Show More
+        </button>
+
+        <button
+          class="code-btn"
+          data-copy-code="${clip.id}"
+        >
+          Copy Code
+        </button>
+
+      </div>
+
+    </div>
+  `;
+}
+
 function renderClips(items = []) {
   if (!items.length) {
     list.innerHTML = `
@@ -85,13 +118,7 @@ function renderClips(items = []) {
 
         ${
           clip.clip_type === "code"
-            ? `
-              <pre class="web-code-block"><code class="language-${getCodeLanguage(
-                clip
-              )}">${escapeHtml(
-                clip.content || ""
-              )}</code></pre>
-            `
+            ? renderCodeBlock(clip)
             : `
               <div class="clip-content">
                 ${escapeHtml(clip.content || "")}
@@ -206,6 +233,55 @@ list.addEventListener(
 
     const deleteId =
       e.target.dataset.delete;
+
+    const toggleId =
+      e.target.dataset.toggle;
+
+    const copyCodeId =
+      e.target.dataset.copyCode;
+
+    if (toggleId) {
+      const code =
+        document.getElementById(
+          `code-${toggleId}`
+        );
+
+      if (!code) return;
+
+      code.classList.toggle(
+        "expanded"
+      );
+
+      e.target.textContent =
+        code.classList.contains(
+          "expanded"
+        )
+          ? "Hide"
+          : "Show More";
+
+      return;
+    }
+
+    if (copyCodeId) {
+      const clip =
+        clips.find(
+          (item) =>
+            String(item.id) ===
+            String(copyCodeId)
+        );
+
+      if (!clip) return;
+
+      await navigator.clipboard.writeText(
+        clip.content || ""
+      );
+
+      showToast(
+        "Code copied ✔"
+      );
+
+      return;
+    }
 
     if (copyId) {
       const clip =

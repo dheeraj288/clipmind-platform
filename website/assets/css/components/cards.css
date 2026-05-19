@@ -485,3 +485,56 @@
 .token.variable{
   color:#facc15;
 }
+
+
+/* CODE COLLAPSE */
+.web-code-wrapper{
+  position:relative;
+}
+
+.web-code-block{
+
+  max-height:240px;
+
+  overflow:hidden;
+
+  transition:
+    max-height .3s ease;
+}
+
+.web-code-block.expanded{
+  max-height:2000px;
+}
+
+.code-controls{
+
+  display:flex;
+
+  gap:10px;
+
+  margin-top:12px;
+}
+
+.code-btn{
+
+  border:none;
+
+  padding:10px 14px;
+
+  border-radius:12px;
+
+  background:
+    rgba(255,255,255,.08);
+
+  color:white;
+
+  cursor:pointer;
+
+  font-size:12px;
+  font-weight:700;
+}
+
+.code-btn:hover{
+  background:
+    rgba(255,255,255,.14);
+}
