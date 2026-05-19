@@ -75,9 +75,17 @@ end
 
     if clip.save
 
-      render json: clip,
-             status: :created
+        AutoCollectionService
+          .new(
+            user: current_user,
+            clip: clip
+          )
+          .call
 
+        render json: clip,
+               status: :created
+
+  
     else
       render json: {
         errors: clip.errors.full_messages
