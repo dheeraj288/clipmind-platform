@@ -82,7 +82,8 @@ function renderCollections(items = []) {
           </h3>
 
           <p>
-            Smart clip collection
+            ${collection.clips_count || 0} clips ·
+            ${collection.total_copies || 0} copies
           </p>
 
         </div>

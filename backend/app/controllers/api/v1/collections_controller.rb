@@ -1,12 +1,24 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
 
-  def index
+   def index
     collections =
       current_user
         .collections
+        .left_joins(:clips)
+        .select(
+          "collections.*",
+          "COUNT(clips.id) AS clips_count",
+          "COALESCE(SUM(clips.copy_count), 0) AS total_copies"
+        )
+        .group("collections.id")
         .order(created_at: :desc)
 
-    render json: collections
+    render json: collections.as_json(
+      methods: [
+        :clips_count,
+        :total_copies
+      ]
+    )
   end
 
   def show
