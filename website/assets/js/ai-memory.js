@@ -105,6 +105,22 @@ function renderMemory(items = []) {
             `
         }
 
+          <div class="memory-reasons">
+
+            ${
+              (clip.ai_reasons || [])
+                .map((reason) => `
+                  <span class="memory-reason-pill">
+                    ${reason.icon}
+                    ${reason.label}
+                    +${reason.points}
+                  </span>
+                `)
+                .join("")
+            }
+
+          </div>
+
         <div class="trend-footer">
 
           <span class="copy-count-pill">

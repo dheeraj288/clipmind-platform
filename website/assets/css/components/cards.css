@@ -538,3 +538,30 @@
   background:
     rgba(255,255,255,.14);
 }
+
+/* AI MEMORY REASONS */
+.memory-reasons{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+
+  margin-top:14px;
+}
+
+.memory-reason-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+
+  padding:7px 10px;
+
+  border-radius:999px;
+
+  background:rgba(168,85,247,.14);
+  color:#d8b4fe;
+
+  font-size:12px;
+  font-weight:800;
+
+  border:1px solid rgba(168,85,247,.22);
+}

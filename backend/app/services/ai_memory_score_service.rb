@@ -2,6 +2,7 @@ class AiMemoryScoreService
 
   def initialize(clip)
     @clip = clip
+    @reasons = []
   end
 
   def call
@@ -13,7 +14,10 @@ class AiMemoryScoreService
     score += recent_create_score
     score += collection_score
 
-    score
+    {
+      score: score,
+      reasons: @reasons
+    }
   end
 
   private
@@ -21,11 +25,33 @@ class AiMemoryScoreService
   attr_reader :clip
 
   def favorite_score
-    clip.is_favorite? ? 100 : 0
+    return 0 unless clip.is_favorite?
+
+    @reasons << {
+      label: "Favorite",
+      icon: "⭐",
+      points: 100
+    }
+
+    100
   end
 
   def copy_score
-    clip.copy_count.to_i * 8
+    copies =
+      clip.copy_count.to_i
+
+    return 0 if copies.zero?
+
+    points =
+      copies * 8
+
+    @reasons << {
+      label: "#{copies} copies",
+      icon: "📋",
+      points: points
+    }
+
+    points
   end
 
   def recent_copy_score
@@ -34,8 +60,26 @@ class AiMemoryScoreService
     hours =
       (Time.current - clip.copied_at) / 1.hour
 
-    return 50 if hours <= 24
-    return 25 if hours <= 72
+    if hours <= 24
+
+      @reasons << {
+        label: "Copied today",
+        icon: "🕒",
+        points: 50
+      }
+
+      return 50
+
+    elsif hours <= 72
+
+      @reasons << {
+        label: "Recently copied",
+        icon: "🕒",
+        points: 25
+      }
+
+      return 25
+    end
 
     0
   end
@@ -46,10 +90,26 @@ class AiMemoryScoreService
     hours =
       (Time.current - clip.created_at) / 1.hour
 
-    hours <= 24 ? 30 : 0
+    return 0 unless hours <= 24
+
+    @reasons << {
+      label: "Created today",
+      icon: "✨",
+      points: 30
+    }
+
+    30
   end
 
   def collection_score
-    clip.collection_id.present? ? 20 : 0
+    return 0 if clip.collection_id.blank?
+
+    @reasons << {
+      label: "In collection",
+      icon: "📚",
+      points: 20
+    }
+
+    20
   end
 end

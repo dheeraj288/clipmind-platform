@@ -163,7 +163,6 @@ def trending
   render json: clips
 end
 
-
 def ai_memory
 
   clips =
@@ -175,7 +174,7 @@ def ai_memory
     clips
       .map do |clip|
 
-        score =
+        result =
           AiMemoryScoreService
             .new(clip)
             .call
@@ -183,11 +182,12 @@ def ai_memory
         clip
           .as_json
           .merge(
-            ai_score: score
+            "ai_score" => result[:score].to_i,
+            "ai_reasons" => result[:reasons] || []
           )
       end
       .sort_by do |clip|
-        -clip[:ai_score]
+        -clip["ai_score"].to_i
       end
       .first(10)
 
