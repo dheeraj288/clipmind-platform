@@ -11,7 +11,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
           "COALESCE(SUM(clips.copy_count), 0) AS total_copies"
         )
         .group("collections.id")
-        .order(created_at: :desc)
+        .order(is_pinned: :desc,created_at: :desc)
 
     render json: collections.as_json(
       methods: [
@@ -77,6 +77,24 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
     render json: {
       message: "Collection deleted"
+    }
+  end
+
+
+  def toggle_pin
+
+    collection =
+      current_user
+        .collections
+        .find(params[:id])
+
+    collection.update!(
+      is_pinned: !collection.is_pinned
+    )
+
+    render json: {
+      id: collection.id,
+      is_pinned: collection.is_pinned
     }
   end
 

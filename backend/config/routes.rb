@@ -8,7 +8,11 @@ Rails.application.routes.draw do
       get  :me,     to: 'auth#me'
 
 
-      resources :collections
+      resources :collections do
+        member do
+          patch :toggle_pin
+        end
+      end
 
       resources :clips do
         member do

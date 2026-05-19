@@ -565,3 +565,64 @@
 
   border:1px solid rgba(168,85,247,.22);
 }
+/* PINNED CARD */
+
+.pinned-card{
+
+  border:
+    1px solid
+    rgba(250,204,21,.18);
+
+  box-shadow:
+    0 0 25px
+    rgba(250,204,21,.08);
+}
+
+.collection-top{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:
+    space-between;
+
+  margin-bottom:14px;
+}
+.pin-icon-btn{
+
+  border:none;
+  background:transparent;
+
+  cursor:pointer;
+
+  font-size:22px;
+
+  transition:.25s;
+
+  /* RED pin default */
+  filter:
+    hue-rotate(-50deg)
+    saturate(500%)
+    brightness(1.2);
+
+}
+
+.pin-icon-btn:hover{
+
+  transform:scale(1.15);
+}
+
+/* GREEN when pinned */
+
+.active-pin{
+
+  filter:
+    hue-rotate(90deg)
+    saturate(500%)
+    brightness(1.2)
+    drop-shadow(
+      0 0 8px
+      rgba(100,105,100,.7)
+    );
+}

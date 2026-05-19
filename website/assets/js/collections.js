@@ -4,6 +4,7 @@ import {
   fetchCollections,
   createCollection,
   deleteCollection,
+  toggleCollectionPin,
 } from "./api.js";
 
 import {
@@ -50,11 +51,9 @@ function escapeHtml(text = "") {
 }
 
 function renderCollections(items = []) {
-
   if (!list) return;
 
   if (!items.length) {
-
     list.innerHTML = `
       <div class="empty-state">
         No collections yet 📚
@@ -64,50 +63,82 @@ function renderCollections(items = []) {
     return;
   }
 
-  list.innerHTML =
-    items.map((collection) => `
-      <a
-        href="collection.html?id=${collection.id}"
-        class="collection-card"
-      >
+  list.innerHTML = items
+    .map((collection) => {
 
-        <div class="collection-icon">
-          📚
-        </div>
+      const pinnedClass =
+        collection.is_pinned
+          ? "pinned-card"
+          : "";
 
-        <div class="collection-info">
+      const pinClass =
+        collection.is_pinned
+          ? "active-pin"
+          : "";
 
-          <h3>
-            ${escapeHtml(collection.name)}
-          </h3>
+      return `
+        <a
+          href="collection.html?id=${collection.id}"
+          class="collection-card ${pinnedClass}"
+        >
 
-          <p>
-            ${collection.clips_count || 0} clips ·
-            ${collection.total_copies || 0} copies
-          </p>
+          <div class="collection-top">
 
-        </div>
+            <div class="collection-icon">
+              📚
+            </div>
 
-        <div class="collection-actions">
+            <button
+              <button
+                <button
+                  <button
+                    type="button"
+                    class="pin-icon-btn ${pinClass}"
+                    data-pin="${collection.id}"
+                    title="${
+                      collection.is_pinned
+                        ? "Unpin collection"
+                        : "Pin collection"
+                    }"
+                  >
+                    📌
+                  </button>
 
-          <button
-            type="button"
-            class="web-action-btn delete-btn"
-            data-delete="${collection.id}"
-          >
-            Delete
-          </button>
+          </div>
 
-        </div>
+          <div class="collection-info">
 
-      </a>
-    `).join("");
+            <h3>
+              ${escapeHtml(collection.name)}
+            </h3>
+
+            <p>
+              ${collection.clips_count || 0} clips ·
+              ${collection.total_copies || 0} copies
+            </p>
+
+          </div>
+
+          <div class="collection-actions">
+
+            <button
+              type="button"
+              class="web-action-btn delete-btn"
+              data-delete="${collection.id}"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </a>
+      `;
+    })
+    .join("");
 }
 
 async function loadCollections() {
-
   try {
-
     collections =
       await fetchCollections();
 
@@ -116,7 +147,6 @@ async function loadCollections() {
     );
 
   } catch (err) {
-
     console.error(err);
 
     if (list) {
@@ -137,7 +167,6 @@ createBtn?.addEventListener(
       input.value.trim();
 
     if (!name) {
-
       showToast(
         "Enter collection name"
       );
@@ -161,8 +190,7 @@ createBtn?.addEventListener(
 
 input?.addEventListener(
   "keydown",
-  async (e) => {
-
+  (e) => {
     if (e.key !== "Enter") return;
 
     createBtn.click();
@@ -171,31 +199,55 @@ input?.addEventListener(
 
 list?.addEventListener(
   "click",
-
   async (e) => {
+
+    const pinBtn =
+      e.target.closest(
+        "[data-pin]"
+      );
 
     const deleteBtn =
       e.target.closest(
         "[data-delete]"
       );
 
-    if (!deleteBtn) return;
+    if (pinBtn) {
+      e.preventDefault();
+      e.stopPropagation();
 
-    e.preventDefault();
-    e.stopPropagation();
+      const pinId =
+        pinBtn.dataset.pin;
 
-    const deleteId =
-      deleteBtn.dataset.delete;
+      await toggleCollectionPin(
+        pinId
+      );
 
-    await deleteCollection(
-      deleteId
-    );
+      await loadCollections();
 
-    await loadCollections();
+      showToast(
+        "Pin updated 📌"
+      );
 
-    showToast(
-      "Collection deleted 🗑"
-    );
+      return;
+    }
+
+    if (deleteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const deleteId =
+        deleteBtn.dataset.delete;
+
+      await deleteCollection(
+        deleteId
+      );
+
+      await loadCollections();
+
+      showToast(
+        "Collection deleted 🗑"
+      );
+    }
   }
 );
 

@@ -1,4 +1,6 @@
 class Collection < ApplicationRecord
+  before_create :set_defaults
+
   belongs_to :user
 
   has_many :clips,
@@ -15,4 +17,10 @@ class Collection < ApplicationRecord
       def total_copies
         self[:total_copies].to_i
       end
+
+      def set_defaults
+        self.is_pinned = false if is_pinned.nil?
+      end
 end
+
+

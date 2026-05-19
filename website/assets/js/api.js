@@ -200,3 +200,12 @@ export async function fetchAiMemory() {
     "/clips/ai_memory"
   );
 }
+
+export async function toggleCollectionPin(id) {
+  return request(
+    `/collections/${id}/toggle_pin`,
+    {
+      method: "PATCH",
+    }
+  );
+}
