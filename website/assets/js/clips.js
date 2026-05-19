@@ -1,5 +1,5 @@
 import {
-  showToast
+  showToast,
 } from "./toast.js";
 
 import {
@@ -9,6 +9,8 @@ import {
   toggleFavorite,
   deleteClip,
   incrementCopy,
+  fetchCollections,
+  updateClip,
 } from "./api.js";
 
 const list =
@@ -21,6 +23,7 @@ const logoutBtn =
   document.getElementById("logout-btn");
 
 let clips = [];
+let collections = [];
 
 if (!getToken()) {
   window.location.href =
@@ -54,7 +57,7 @@ function renderClips(items = []) {
       <div class="web-clip-card" data-id="${clip.id}">
 
         <div class="clip-meta">
-          <span>
+          <span class="type-badge">
             ${clip.clip_type || "text"}
           </span>
 
@@ -76,6 +79,35 @@ function renderClips(items = []) {
               </div>
             `
         }
+
+        <div class="collection-select-wrap">
+
+          <select
+            class="collection-select"
+            data-collection="${clip.id}"
+          >
+
+            <option value="">
+              No Collection
+            </option>
+
+            ${collections.map((collection) => `
+              <option
+                value="${collection.id}"
+                ${
+                  String(clip.collection_id || "") ===
+                  String(collection.id)
+                    ? "selected"
+                    : ""
+                }
+              >
+                ${escapeHtml(collection.name)}
+              </option>
+            `).join("")}
+
+          </select>
+
+        </div>
 
         <div class="web-card-actions">
 
@@ -109,13 +141,23 @@ function renderClips(items = []) {
 
 async function loadClips() {
   try {
-    const response =
-      await fetchClips();
+    const [
+      clipsResponse,
+      collectionsResponse,
+    ] = await Promise.all([
+      fetchClips(),
+      fetchCollections(),
+    ]);
 
     clips =
-      Array.isArray(response)
-        ? response
-        : response.clips || [];
+      Array.isArray(clipsResponse)
+        ? clipsResponse
+        : clipsResponse.clips || [];
+
+    collections =
+      Array.isArray(collectionsResponse)
+        ? collectionsResponse
+        : [];
 
     renderClips(clips);
 
@@ -157,10 +199,11 @@ list.addEventListener(
 
       const res =
         await incrementCopy(copyId);
-        showToast("Copied ✔");
 
       clip.copy_count =
         res.copy_count;
+
+      showToast("Copied ✔");
 
       renderClips(clips);
 
@@ -169,16 +212,56 @@ list.addEventListener(
 
     if (favId) {
       await toggleFavorite(favId);
+
       showToast("Favorite updated ⭐");
+
       await loadClips();
+
       return;
     }
 
     if (deleteId) {
       await deleteClip(deleteId);
+
       showToast("Deleted 🗑");
+
       await loadClips();
     }
+  }
+);
+
+list.addEventListener(
+  "change",
+  async (e) => {
+    const clipId =
+      e.target.dataset.collection;
+
+    if (!clipId) return;
+
+    const collectionId =
+      e.target.value || null;
+
+    await updateClip(
+      clipId,
+      {
+        collection_id: collectionId,
+      }
+    );
+
+    const clip =
+      clips.find(
+        (item) =>
+          String(item.id) === String(clipId)
+      );
+
+    if (clip) {
+      clip.collection_id =
+        collectionId;
+    }
+
+    showToast("Collection updated 📚");
+
+    renderClips(clips);
   }
 );
 

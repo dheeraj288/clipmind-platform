@@ -3,6 +3,7 @@ before_create :set_defaults
   
 
   belongs_to :user
+  belongs_to :collection, optional: true
 
   has_many :clip_copy_logs, dependent: :destroy
 

@@ -265,3 +265,158 @@
 .web-code-block code{
   font-family:inherit;
 }
+
+/* COLLECTION CREATE */
+.collection-create{
+  display:flex;
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.collection-create input{
+  flex:1;
+
+  padding:14px 16px;
+
+  border-radius:14px;
+
+  border:1px solid var(--border-soft);
+  outline:none;
+
+  background:rgba(3,5,18,.85);
+  color:var(--text-main);
+
+  font-size:14px;
+}
+
+.collection-create input::placeholder{
+  color:var(--text-muted);
+}
+
+.collection-create button{
+  border:none;
+  outline:none;
+
+  padding:14px 18px;
+
+  border-radius:14px;
+
+  background:var(--gradient-purple);
+  color:white;
+
+  font-size:14px;
+  font-weight:900;
+
+  box-shadow:0 14px 34px rgba(168,85,247,.25);
+
+  transition:.2s ease;
+}
+
+.collection-create button:hover{
+  transform:translateY(-1px);
+}
+
+
+/* COLLECTION GRID */
+#collections-list{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.collection-card{
+  position:relative;
+  overflow:hidden;
+
+  padding:22px;
+
+  border-radius:var(--radius-lg);
+
+  background:rgba(3,5,18,.82);
+  border:1px solid var(--border-soft);
+
+  transition:.2s ease;
+}
+
+.collection-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background:radial-gradient(
+    circle at top right,
+    rgba(168,85,247,.22),
+    transparent 42%
+  );
+
+  pointer-events:none;
+}
+
+.collection-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(168,85,247,.45);
+}
+
+.collection-icon{
+  position:relative;
+
+  width:48px;
+  height:48px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  margin-bottom:18px;
+
+  border-radius:16px;
+
+  background:rgba(255,255,255,.08);
+
+  font-size:24px;
+}
+
+.collection-info,
+.collection-actions{
+  position:relative;
+}
+
+.collection-info h3{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.collection-info p{
+  color:var(--text-muted);
+  font-size:13px;
+  margin-bottom:18px;
+}
+
+
+/* COLLECTION SELECT */
+.collection-select-wrap{
+  margin-top:16px;
+}
+
+.collection-select{
+  width:100%;
+
+  padding:12px 14px;
+
+  border-radius:14px;
+
+  border:1px solid var(--border-soft);
+  outline:none;
+
+  background:rgba(255,255,255,.06);
+  color:var(--text-main);
+
+  font-size:13px;
+  font-weight:700;
+}
+
+.collection-select option{
+  background:#020617;
+  color:white;
+}

@@ -7,6 +7,9 @@ Rails.application.routes.draw do
       post :login,  to: 'auth#login'
       get  :me,     to: 'auth#me'
 
+
+      resources :collections
+
       resources :clips do
         member do
           patch :toggle_favorite

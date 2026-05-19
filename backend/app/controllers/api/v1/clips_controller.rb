@@ -46,58 +46,64 @@ end
 
   def create
 
-  existing_clip = current_user.clips
-    .where(content: clip_params[:content])
-    .where(
-      "created_at > ?",
-      5.minutes.ago
+    existing_clip = current_user.clips
+      .where(content: clip_params[:content])
+      .where(
+        "created_at > ?",
+        5.minutes.ago
+      )
+      .first
+
+    if existing_clip
+
+      render json: {
+        message: 'Duplicate clip ignored'
+      }, status: :ok
+
+      return
+    end
+
+    detection = ClipDetectorService.detect(clip_params[:content])
+
+    clip = current_user.clips.new(
+      clip_params.merge(
+        clip_type: detection[:clip_type],
+        language: detection[:language]
+      )
     )
-    .first
 
-  if existing_clip
+    if clip.save
 
-    render json: {
-      message: 'Duplicate clip ignored'
-    }, status: :ok
+      render json: clip,
+             status: :created
 
-    return
+    else
+      render json: {
+        errors: clip.errors.full_messages
+      }, status: :unprocessable_entity
+    end
   end
-
-  detection = ClipDetectorService.detect(clip_params[:content])
-
-  clip = current_user.clips.new(
-    clip_params.merge(
-      clip_type: detection[:clip_type],
-      language: detection[:language]
-    )
-  )
-
-  if clip.save
-
-    render json: clip,
-           status: :created
-
-  else
-
-    render json: {
-      errors: clip.errors.full_messages
-    }, status: :unprocessable_entity
-  end
-end
 
   def show
     render json: @clip
   end
 
+
   def update
-    if @clip.update(clip_params)
-      render json: @clip
-    else
-      render json: {
-        errors: @clip.errors.full_messages
-      }, status: :unprocessable_entity
-    end
+  if clip_params[:collection_id].present?
+    current_user
+      .collections
+      .find(clip_params[:collection_id])
   end
+
+  if @clip.update(clip_params)
+    render json: @clip
+  else
+    render json: {
+      errors: @clip.errors.full_messages
+    }, status: :unprocessable_entity
+  end
+end
 
   def destroy
 
@@ -172,7 +178,8 @@ end
       :clip_type,
       :language,
       :source_url,
-      :page_title
+      :page_title,
+      :collection_id
     )
   end
 end

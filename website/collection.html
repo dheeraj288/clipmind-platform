@@ -9,7 +9,7 @@
     content="width=device-width, initial-scale=1.0"
   />
 
-  <title>ClipMind - Trending</title>
+  <title>ClipMind - Collection</title>
 
   <link
     rel="stylesheet"
@@ -40,7 +40,7 @@
             All Clips
           </a>
 
-          <a href="collections.html" class="menu-item">
+          <a href="collections.html" class="menu-item active">
             Collections
           </a>
 
@@ -48,7 +48,7 @@
             Favorites
           </a>
 
-          <a href="trending.html" class="menu-item active">
+          <a href="trending.html" class="menu-item">
             Trending
           </a>
 
@@ -76,16 +76,15 @@
         <div>
 
           <p class="hero-label">
-            Usage Intelligence
+            Collection Workspace
           </p>
 
-          <h1>
-            Your currently
-            <span>trending clips.</span>
+          <h1 id="collection-title">
+            Loading...
           </h1>
 
           <p class="hero-subtitle">
-            Clips ranked by recent usage, copy count, and smart behavior signals.
+            Organized clips inside this collection.
           </p>
 
         </div>
@@ -95,10 +94,10 @@
       <section class="dashboard-section">
 
         <div class="section-title">
-          🔥 Trending Clips
+          📚 Collection Clips
         </div>
 
-        <div id="trending-page-list"></div>
+        <div id="collection-clips-list"></div>
 
       </section>
 
@@ -108,11 +107,11 @@
 
   <script
     type="module"
-    src="assets/js/trending.js"
+    src="assets/js/collection.js"
   ></script>
 
   <div id="toast" class="web-toast">
-    Copied ✔
+    Done ✔
   </div>
 
 </body>

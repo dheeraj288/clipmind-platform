@@ -155,3 +155,42 @@ export async function incrementCopy(id) {
     }
   );
 }
+
+export async function fetchCollections() {
+  return request("/collections");
+}
+
+export async function createCollection(name) {
+  return request(
+    "/collections",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        collection: {
+          name: name,
+        },
+      }),
+    }
+  );
+}
+
+export async function deleteCollection(id) {
+  return request(
+    `/collections/${id}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+export async function updateClip(id, data) {
+  return request(
+    `/clips/${id}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        clip: data,
+      }),
+    }
+  );
+}
