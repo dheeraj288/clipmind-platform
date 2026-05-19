@@ -22,6 +22,9 @@ Rails.application.routes.draw do
         collection do
           get :trending
           get :ai_memory
+          
+          patch :bulk_update
+          delete :bulk_delete
         end
       end
     end

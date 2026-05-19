@@ -11,6 +11,12 @@ import {
   showToast,
 } from "./toast.js";
 
+
+const search =
+  document.getElementById(
+    "collection-search"
+  );
+
 const list =
   document.getElementById(
     "collections-list"
@@ -136,6 +142,26 @@ function renderCollections(items = []) {
     })
     .join("");
 }
+
+search?.addEventListener(
+  "input",
+  (e) => {
+
+    const query =
+      e.target.value
+        .toLowerCase()
+        .trim();
+
+    const filtered =
+      collections.filter((collection) =>
+        collection.name
+          ?.toLowerCase()
+          .includes(query)
+      );
+
+    renderCollections(filtered);
+  }
+);
 
 async function loadCollections() {
   try {

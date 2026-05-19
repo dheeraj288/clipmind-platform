@@ -209,3 +209,35 @@ export async function toggleCollectionPin(id) {
     }
   );
 }
+
+export async function bulkUpdateClips(
+  clipIds,
+  collectionId
+) {
+  return request(
+    "/clips/bulk_update",
+    {
+      method: "PATCH",
+
+      body: JSON.stringify({
+        clip_ids: clipIds,
+        collection_id: collectionId,
+      }),
+    }
+  );
+}
+
+export async function bulkDeleteClips(
+  clipIds
+) {
+  return request(
+    "/clips/bulk_delete",
+    {
+      method: "DELETE",
+
+      body: JSON.stringify({
+        clip_ids: clipIds,
+      }),
+    }
+  );
+}

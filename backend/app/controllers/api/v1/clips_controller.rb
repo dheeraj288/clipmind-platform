@@ -194,7 +194,42 @@ def ai_memory
   render json: ranked_clips
 end
 
-  private
+def bulk_update
+
+  clips =
+    current_user.clips.where(
+      id: params[:clip_ids]
+    )
+
+  clips.update_all(
+    collection_id:
+      params[:collection_id]
+  )
+
+  render json: {
+    success: true
+  }
+end
+
+
+def bulk_delete
+
+  clips =
+    current_user.clips.where(
+      id: params[:clip_ids]
+    )
+
+  clips.update_all(
+    deleted_at:
+      Time.current
+  )
+
+  render json: {
+    success: true
+  }
+end
+
+private
 
   def set_clip
     @clip = current_user.clips.find(params[:id])

@@ -11,6 +11,8 @@ import {
   incrementCopy,
   fetchCollections,
   updateClip,
+  bulkUpdateClips,
+  bulkDeleteClips,
 } from "./api.js";
 
 const list =
@@ -22,8 +24,19 @@ const search =
 const logoutBtn =
   document.getElementById("logout-btn");
 
+const bulkDeleteBtn =
+  document.getElementById(
+    "bulk-delete-btn"
+  );
+
+const bulkCollectionSelect =
+  document.getElementById(
+    "bulk-collection-select"
+  );
+
 let clips = [];
 let collections = [];
+let selectedClipIds = [];
 
 if (!getToken()) {
   window.location.href =
@@ -92,6 +105,22 @@ function renderCodeBlock(clip) {
   `;
 }
 
+function fillBulkCollectionSelect() {
+  if (!bulkCollectionSelect) return;
+
+  bulkCollectionSelect.innerHTML = `
+    <option value="">
+      Move Selected To...
+    </option>
+
+    ${collections.map((collection) => `
+      <option value="${collection.id}">
+        ${escapeHtml(collection.name)}
+      </option>
+    `).join("")}
+  `;
+}
+
 function renderClips(items = []) {
   if (!items.length) {
     list.innerHTML = `
@@ -105,6 +134,24 @@ function renderClips(items = []) {
   list.innerHTML = items
     .map((clip) => `
       <div class="web-clip-card" data-id="${clip.id}">
+
+        <label class="bulk-check">
+
+          <input
+            type="checkbox"
+            data-select="${clip.id}"
+            ${
+              selectedClipIds.includes(
+                String(clip.id)
+              )
+                ? "checked"
+                : ""
+            }
+          />
+
+          <span>Select</span>
+
+        </label>
 
         <div class="clip-meta">
           <span class="type-badge">
@@ -208,6 +255,8 @@ async function loadClips() {
       Array.isArray(collectionsResponse)
         ? collectionsResponse
         : [];
+
+    fillBulkCollectionSelect();
 
     renderClips(clips);
 
@@ -322,6 +371,11 @@ list.addEventListener(
     if (deleteId) {
       await deleteClip(deleteId);
 
+      selectedClipIds =
+        selectedClipIds.filter(
+          (id) => id !== String(deleteId)
+        );
+
       showToast("Deleted 🗑");
 
       await loadClips();
@@ -332,6 +386,30 @@ list.addEventListener(
 list.addEventListener(
   "change",
   async (e) => {
+    const selectId =
+      e.target.dataset.select;
+
+    if (selectId) {
+      if (e.target.checked) {
+        if (
+          !selectedClipIds.includes(
+            String(selectId)
+          )
+        ) {
+          selectedClipIds.push(
+            String(selectId)
+          );
+        }
+      } else {
+        selectedClipIds =
+          selectedClipIds.filter(
+            (id) => id !== String(selectId)
+          );
+      }
+
+      return;
+    }
+
     const clipId =
       e.target.dataset.collection;
 
@@ -361,6 +439,59 @@ list.addEventListener(
     showToast("Collection updated 📚");
 
     renderClips(clips);
+  }
+);
+
+bulkDeleteBtn?.addEventListener(
+  "click",
+  async () => {
+    if (!selectedClipIds.length) {
+      showToast("Select clips first");
+      return;
+    }
+
+    await bulkDeleteClips(
+      selectedClipIds
+    );
+
+    selectedClipIds = [];
+
+    await loadClips();
+
+    showToast(
+      "Selected clips deleted 🗑"
+    );
+  }
+);
+
+bulkCollectionSelect?.addEventListener(
+  "change",
+  async (e) => {
+    const collectionId =
+      e.target.value;
+
+    if (!collectionId) return;
+
+    if (!selectedClipIds.length) {
+      showToast("Select clips first");
+      e.target.value = "";
+      return;
+    }
+
+    await bulkUpdateClips(
+      selectedClipIds,
+      collectionId
+    );
+
+    selectedClipIds = [];
+
+    e.target.value = "";
+
+    await loadClips();
+
+    showToast(
+      "Selected clips moved 📚"
+    );
   }
 );
 

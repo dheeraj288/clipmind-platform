@@ -626,3 +626,82 @@
       rgba(100,105,100,.7)
     );
 }
+
+
+.bulk-toolbar{
+
+  display:flex;
+
+  gap:12px;
+
+  margin:20px 0;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+}
+
+#bulk-collection-select{
+
+  padding:10px;
+
+  border-radius:10px;
+
+  background:#1f2937;
+
+  color:white;
+
+  border:none;
+}
+
+/* BULK ACTIONS */
+.bulk-toolbar{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+
+  margin:20px 0;
+  padding:14px;
+
+  border-radius:16px;
+
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border-soft);
+}
+
+#bulk-collection-select{
+  min-width:220px;
+
+  padding:10px 12px;
+
+  border-radius:12px;
+
+  border:1px solid var(--border-soft);
+  outline:none;
+
+  background:#020617;
+  color:white;
+
+  font-size:13px;
+  font-weight:700;
+}
+
+.bulk-check{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  margin-bottom:12px;
+
+  color:var(--text-muted);
+
+  font-size:13px;
+  font-weight:800;
+}
+
+.bulk-check input{
+  width:16px;
+  height:16px;
+  accent-color:#a855f7;
+}
