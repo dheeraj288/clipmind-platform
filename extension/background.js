@@ -9,7 +9,6 @@ const recentClips = new Map();
 
 /* GET AUTH TOKEN */
 async function getToken() {
-
   const result =
     await chrome.storage.local.get(
       "token"
@@ -20,11 +19,9 @@ async function getToken() {
 
 /* DUPLICATE CHECK */
 function isDuplicate(text) {
-
   const now = Date.now();
 
   if (recentClips.has(text)) {
-
     const lastTime =
       recentClips.get(text);
 
@@ -38,19 +35,50 @@ function isDuplicate(text) {
   return false;
 }
 
+/* NORMALIZE CLIP MESSAGE */
+function normalizeClipMessage(message) {
+  const text =
+    message.content?.trim() || "";
+
+  return {
+    text,
+
+    title:
+      text.substring(0, 30),
+
+    source_url:
+      message.source_url || null,
+
+    page_title:
+      message.page_title || null,
+
+    site_name:
+      message.site_name || null,
+
+    favicon_url:
+      message.favicon_url || null,
+
+    preview_image:
+      message.preview_image || null,
+
+    page_description:
+      message.page_description || null,
+
+    content_kind:
+      message.content_kind || "page",
+
+    surrounding_text:
+      message.surrounding_text || null,
+  };
+}
+
 /* SYNC TO RAILS */
-async function syncClipToServer(
-  message
-) {
-
+async function syncClipToServer(message) {
   try {
-
     const token =
       await getToken();
 
-    /* USER NOT LOGGED IN */
     if (!token) {
-
       console.log(
         "No authenticated user"
       );
@@ -58,8 +86,10 @@ async function syncClipToServer(
       return;
     }
 
-    const text =
-      message.content;
+    const clipData =
+      normalizeClipMessage(message);
+
+    if (!clipData.text) return;
 
     const response =
       await fetch(
@@ -77,11 +107,11 @@ async function syncClipToServer(
 
           body: JSON.stringify({
             clip: {
-
               title:
-                text.substring(0, 30),
+                clipData.title,
 
-              content: text,
+              content:
+                clipData.text,
 
               source:
                 "chrome-extension",
@@ -89,21 +119,38 @@ async function syncClipToServer(
               copied_at:
                 new Date().toISOString(),
 
-              is_favorite: false,
+              is_favorite:
+                false,
 
               source_url:
-                message.source_url,
+                clipData.source_url,
 
               page_title:
-                message.page_title,
+                clipData.page_title,
+
+              site_name:
+                clipData.site_name,
+
+              favicon_url:
+                clipData.favicon_url,
+
+              preview_image:
+                clipData.preview_image,
+
+              page_description:
+                clipData.page_description,
+
+              content_kind:
+                clipData.content_kind,
+
+              surrounding_text:
+                clipData.surrounding_text,
             },
           }),
         }
       );
 
-    /* UNAUTHORIZED */
     if (response.status === 401) {
-
       console.error(
         "Unauthorized user"
       );
@@ -119,13 +166,21 @@ async function syncClipToServer(
     const data =
       await response.json();
 
+    if (!response.ok) {
+      console.error(
+        "SYNC FAILED:",
+        data
+      );
+
+      return;
+    }
+
     console.log(
       "SYNCED:",
       data
     );
 
   } catch (error) {
-
     console.error(
       "SYNC ERROR:",
       error
@@ -133,38 +188,93 @@ async function syncClipToServer(
   }
 }
 
+/* LOCAL STORAGE SAVE */
+async function saveClipLocally(message) {
+  const clipData =
+    normalizeClipMessage(message);
+
+  const res =
+    await chrome.storage.local.get(
+      ["clips"]
+    );
+
+  let clips =
+    res.clips || [];
+
+  clips =
+    clips.filter(
+      (item) =>
+        item.text !== clipData.text
+    );
+
+  clips.unshift({
+    id: Date.now(),
+
+    text:
+      clipData.text,
+
+    time:
+      new Date()
+        .toLocaleString(),
+
+    pinned:
+      false,
+
+    source_url:
+      clipData.source_url,
+
+    page_title:
+      clipData.page_title,
+
+    site_name:
+      clipData.site_name,
+
+    favicon_url:
+      clipData.favicon_url,
+
+    preview_image:
+      clipData.preview_image,
+
+    page_description:
+      clipData.page_description,
+
+    content_kind:
+      clipData.content_kind,
+
+    surrounding_text:
+      clipData.surrounding_text,
+  });
+
+  clips =
+    clips.slice(0, 300);
+
+  await chrome.storage.local.set({
+    clips,
+  });
+}
+
 /* INJECT CONTENT SCRIPT */
 async function injectContentScript() {
-
   const tabs =
     await chrome.tabs.query({});
 
   for (const tab of tabs) {
-
     if (
       tab.url &&
       (
-        tab.url.startsWith(
-          "http://"
-        ) ||
-
-        tab.url.startsWith(
-          "https://"
-        )
+        tab.url.startsWith("http://") ||
+        tab.url.startsWith("https://")
       )
     ) {
-
       try {
-
         await chrome.scripting
           .executeScript({
-
             target: {
-              tabId: tab.id
+              tabId: tab.id,
             },
 
             files: [
-              "content.js"
+              "content.js",
             ],
           });
 
@@ -174,7 +284,7 @@ async function injectContentScript() {
         );
 
       } catch (error) {
-        /* ignore */
+        /* ignore restricted pages */
       }
     }
   }
@@ -201,13 +311,16 @@ chrome.runtime.onMessage
       const text =
         message.content?.trim();
 
-      if (!text) return;
+      if (!text) {
+        sendResponse({
+          success: false,
+          error: "empty_content",
+        });
 
-      /* DUPLICATE BLOCK */
-      if (
-        isDuplicate(text)
-      ) {
+        return;
+      }
 
+      if (isDuplicate(text)) {
         sendResponse({
           success: false,
           duplicate: true,
@@ -216,67 +329,39 @@ chrome.runtime.onMessage
         return;
       }
 
-      chrome.storage.local.get(
-        ["clips"],
+      (async () => {
+        try {
+          await saveClipLocally(
+            message
+          );
 
-        (res) => {
+          await syncClipToServer(
+            message
+          );
 
-          let clips =
-            res.clips || [];
+          chrome.runtime
+            .sendMessage({
+              type:
+                "CLIP_UPDATED",
+            });
 
-          /* REMOVE DUPLICATES */
-          clips =
-            clips.filter(
-              (i) =>
-                i.text !== text
-            );
-
-          /* ADD NEW */
-          clips.unshift({
-
-            id: Date.now(),
-
-            text,
-
-            time:
-              new Date()
-                .toLocaleString(),
-
-            pinned: false,
-
-            source_url:
-              message.source_url,
-
-            page_title:
-              message.page_title,
+          sendResponse({
+            success: true,
           });
 
-          /* LIMIT */
-          clips =
-            clips.slice(0, 300);
-
-          chrome.storage.local.set(
-            { clips },
-
-            async () => {
-
-              await syncClipToServer(
-                message
-              );
-
-              chrome.runtime
-                .sendMessage({
-                  type:
-                    "CLIP_UPDATED",
-                });
-
-              sendResponse({
-                success: true,
-              });
-            }
+        } catch (error) {
+          console.error(
+            "SAVE_CLIP ERROR:",
+            error
           );
+
+          sendResponse({
+            success: false,
+            error:
+              error.message,
+          });
         }
-      );
+      })();
 
       return true;
     }

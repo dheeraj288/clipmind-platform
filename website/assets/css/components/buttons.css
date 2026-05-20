@@ -1,0 +1,115 @@
+/* ===============================
+   BASE ACTIONS
+================================ */
+
+.web-card-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:14px;
+}
+
+.web-action-btn{
+  border:none;
+  outline:none;
+  padding:9px 13px;
+  border-radius:12px;
+  background:rgba(255,255,255,.07);
+  color:var(--text-main);
+  font-size:13px;
+  font-weight:800;
+  transition:.2s ease;
+}
+
+.web-action-btn:hover{
+  background:
+    rgba(168,85,247,.2);
+  transform:translateY(-1px);
+}
+
+/* ===============================
+   PREMIUM ACTIONS
+================================ */
+
+.premium-actions{
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+.premium-actions .web-action-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:10px 14px;
+  border-radius:14px;
+  font-size:13px;
+  font-weight:900;
+  border:1px solid transparent;
+}
+
+/* ===============================
+   ACTION COLORS
+================================ */
+
+.action-copy{
+  background:rgba(59,130,246,.14);
+  color:#bfdbfe;
+  border-color:rgba(59,130,246,.25) !important;
+}
+
+.action-fav{
+  background:rgba(250,204,21,.12);
+  color:#fde68a;
+  border-color:rgba(250,204,21,.25) !important;
+}
+
+.action-pin{
+  background:rgba(34,197,94,.12);
+  color:#bbf7d0;
+  border-color:rgba(34,197,94,.25) !important;
+}
+
+.action-related{
+  background:rgba(168,85,247,.14);
+  color:#e9d5ff;
+  border-color:rgba(168,85,247,.25) !important;
+}
+
+.action-delete,
+.delete-btn{
+  background:rgba(239,68,68,.12);
+  color:#fecaca;
+  border-color:rgba(239,68,68,.25) !important;
+}
+
+.action-delete:hover,
+.delete-btn:hover{
+  background:rgba(239,68,68,.24);
+}
+
+/* ===============================
+   CODE BUTTONS
+================================ */
+
+.code-controls{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+
+.code-btn{
+  border:none;
+  padding:10px 14px;
+  border-radius:12px;
+  background:rgba(255,255,255,.08);
+  color:white;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+}
+
+.code-btn:hover{
+  background:
+    rgba(255,255,255,.14);
+}

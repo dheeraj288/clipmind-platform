@@ -288,7 +288,13 @@ class Api::V1::ClipsController < Api::V1::BaseController
       :language,
       :source_url,
       :page_title,
-      :collection_id
+      :collection_id,
+      :site_name,
+      :favicon_url,
+      :preview_image,
+      :page_description,
+      :content_kind,
+      :surrounding_text
     )
   end
 end

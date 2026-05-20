@@ -58,6 +58,152 @@ function escapeHtml(text = "") {
     .replace(/>/g, "&gt;");
 }
 
+function getPreviewImage(clip) {
+  const url =
+    clip.source_url || "";
+
+  try {
+    const parsedUrl =
+      new URL(url);
+
+    let videoId = null;
+
+    if (
+      parsedUrl.hostname.includes(
+        "youtube.com"
+      )
+    ) {
+      videoId =
+        parsedUrl.searchParams.get("v");
+    }
+
+    if (
+      parsedUrl.hostname.includes(
+        "youtu.be"
+      )
+    ) {
+      videoId =
+        parsedUrl.pathname
+          .replace("/", "")
+          .split("?")[0];
+    }
+
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    }
+
+  } catch (error) {
+    return clip.preview_image || "";
+  }
+
+  return clip.preview_image || "";
+}
+
+function renderRichPreview(clip) {
+  const image =
+    getPreviewImage(clip);
+
+  const isVideo =
+    clip.content_kind === "video";
+
+  const isLink =
+    clip.clip_type === "link";
+
+  if (!image) return "";
+
+  if (!isVideo && !isLink) {
+    return "";
+  }
+
+  return `
+    <div class="rich-preview">
+
+      <img
+        src="${escapeHtml(image)}"
+        class="preview-image"
+        alt="preview"
+      />
+
+      <div class="preview-overlay">
+
+        <div class="preview-type">
+          ${
+            isVideo
+              ? "🎥 Video"
+              : "🌐 Link"
+          }
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+
+function renderVideoPreview(clip) {
+
+  const image =
+    getPreviewImage(clip);
+
+  if (
+    clip.content_kind !== "video" ||
+    !image
+  ) {
+    return "";
+  }
+
+  return `
+    <div class="video-preview-card">
+
+      <div class="video-thumb">
+
+        <img
+          src="${escapeHtml(image)}"
+          alt="video preview"
+        />
+
+        <span>
+          🎥 Video
+        </span>
+
+      </div>
+
+      <div class="video-info">
+
+        <h3>
+          ${
+            escapeHtml(
+              clip.page_title ||
+              clip.content ||
+              "Video"
+            )
+          }
+        </h3>
+
+        <p>
+          ${
+            escapeHtml(
+              clip.site_name ||
+              "Source"
+            )
+          }
+        </p>
+
+        <a
+          href="${escapeHtml(clip.source_url || "#")}"
+          target="_blank"
+          class="source-open-btn video-open-btn"
+        >
+          Open Source
+        </a>
+
+      </div>
+
+    </div>
+  `;
+}
+
 function getCodeLanguage(clip) {
   const language =
     clip.language ||
@@ -124,6 +270,239 @@ function fillBulkCollectionSelect() {
   `;
 }
 
+function renderTags(clip) {
+  if (!clip.tags || !clip.tags.length) return "";
+
+  return `
+    <div class="tag-list">
+      ${clip.tags.map((tag) => `
+        <span class="tag-pill">
+          #${escapeHtml(tag)}
+        </span>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderSourcePreview(clip) {
+  if (!clip.source_url) return "";
+
+  return `
+    <div class="source-preview">
+
+      <div class="source-left">
+
+        ${
+          clip.favicon_url
+            ? `
+              <img
+                src="${escapeHtml(clip.favicon_url)}"
+                alt="site icon"
+                class="source-favicon"
+              />
+            `
+            : `
+              <div class="source-fallback-icon">
+                🌐
+              </div>
+            `
+        }
+
+        <div>
+
+          <div class="source-site">
+            ${escapeHtml(
+              clip.site_name || "Source"
+            )}
+          </div>
+
+          <div class="source-title">
+            ${escapeHtml(
+              clip.page_title || clip.source_url
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+      <a
+        href="${escapeHtml(clip.source_url)}"
+        target="_blank"
+        class="source-open-btn"
+      >
+        Open Source
+      </a>
+
+    </div>
+  `;
+}
+
+function renderCollectionSelect(clip) {
+  return `
+    <div class="collection-select-wrap">
+
+      <select
+        class="collection-select"
+        data-collection="${clip.id}"
+      >
+
+        <option value="">
+          No Collection
+        </option>
+
+        ${collections.map((collection) => `
+          <option
+            value="${collection.id}"
+            ${
+              String(clip.collection_id || "") ===
+              String(collection.id)
+                ? "selected"
+                : ""
+            }
+          >
+            ${escapeHtml(collection.name)}
+          </option>
+        `).join("")}
+
+      </select>
+
+    </div>
+  `;
+}
+
+function renderActions(clip) {
+  return `
+    <div class="web-card-actions premium-actions">
+
+      <button
+        class="web-action-btn action-copy"
+        data-copy="${clip.id}"
+      >
+        📋 Copy
+      </button>
+
+      <button
+        class="web-action-btn action-fav"
+        data-fav="${clip.id}"
+      >
+        ${clip.is_favorite ? "⭐ Favorited" : "☆ Favorite"}
+      </button>
+
+      <button
+        class="web-action-btn action-pin"
+        data-pin="${clip.id}"
+      >
+        ${clip.is_pinned ? "📌 Pinned" : "📍 Pin"}
+      </button>
+
+      <button
+        class="web-action-btn action-related"
+        data-related="${clip.id}"
+      >
+        🔗 Related
+      </button>
+
+      <button
+        class="web-action-btn action-delete"
+        data-delete="${clip.id}"
+      >
+        🗑 Delete
+      </button>
+
+    </div>
+  `;
+}
+
+function renderRelated(clip) {
+  if (!relatedMap[clip.id]) return "";
+
+  return `
+    <div class="related-box">
+
+      <h4>
+        Related Clips
+      </h4>
+
+      ${
+        relatedMap[clip.id].length
+          ? relatedMap[clip.id]
+              .map((item) => `
+                <div class="related-item">
+
+                  <div class="related-meta">
+                    <span>
+                      ${(item.clip_type || "text").toUpperCase()}
+                    </span>
+
+                    ${
+                      item.language
+                        ? `
+                          <span>
+                            ${escapeHtml(item.language)}
+                          </span>
+                        `
+                        : ""
+                    }
+                  </div>
+
+                  ${
+                    item.clip_type === "code"
+                      ? `
+                        <pre class="related-code-preview"><code class="language-${getCodeLanguage(
+                          item
+                        )}">${escapeHtml(
+                          item.content.slice(0, 220)
+                        )}</code></pre>
+                      `
+                      : `
+                        <div class="related-preview">
+                          ${escapeHtml(
+                            item.content.slice(0, 140)
+                          )}
+                        </div>
+                      `
+                  }
+
+                  ${
+                    item.tags && item.tags.length
+                      ? `
+                        <div class="related-tags">
+                          ${item.tags.slice(0, 4).map((tag) => `
+                            <span>
+                              #${escapeHtml(tag)}
+                            </span>
+                          `).join("")}
+                        </div>
+                      `
+                      : ""
+                  }
+
+                  <div class="related-actions">
+
+                    <button
+                      class="code-btn"
+                      data-open-related="${item.id}"
+                    >
+                      Open
+                    </button>
+
+                  </div>
+
+                </div>
+              `)
+              .join("")
+          : `
+            <div class="related-item muted">
+              No related clips found
+            </div>
+          `
+      }
+
+    </div>
+  `;
+}
+
 function renderClips(items = []) {
   if (!items.length) {
     list.innerHTML = `
@@ -167,185 +546,45 @@ function renderClips(items = []) {
         </div>
 
         ${
+          clip.content_kind === "video"
+            ? renderVideoPreview(clip)
+            : renderRichPreview(clip)
+        }
+
+        ${
           clip.clip_type === "code"
             ? renderCodeBlock(clip)
-            : `
-              <div class="clip-content">
-                ${escapeHtml(clip.content || "")}
-              </div>
-            `
+
+            : ["video"]
+              .includes(
+                clip.content_kind
+              )
+
+            ? ""
+
+              : `
+                <div class="clip-content">
+
+                  ${escapeHtml(
+                    clip.content || ""
+                  )}
+
+                </div>
+              `
         }
 
         ${
-          clip.tags && clip.tags.length
-            ? `
-              <div class="tag-list">
-                ${clip.tags.map((tag) => `
-                  <span class="tag-pill">
-                    #${escapeHtml(tag)}
-                  </span>
-                `).join("")}
-              </div>
-            `
-            : ""
-        }  
-
-        <div class="collection-select-wrap">
-
-          <select
-            class="collection-select"
-            data-collection="${clip.id}"
-          >
-
-            <option value="">
-              No Collection
-            </option>
-
-            ${collections.map((collection) => `
-              <option
-                value="${collection.id}"
-                ${
-                  String(clip.collection_id || "") ===
-                  String(collection.id)
-                    ? "selected"
-                    : ""
-                }
-              >
-                ${escapeHtml(collection.name)}
-              </option>
-            `).join("")}
-
-          </select>
-
-        </div>
-
-        <div class="web-card-actions premium-actions">
-
-          <button
-            class="web-action-btn action-copy"
-            data-copy="${clip.id}"
-          >
-            📋 Copy
-          </button>
-
-          <button
-            class="web-action-btn action-fav"
-            data-fav="${clip.id}"
-          >
-            ${clip.is_favorite ? "⭐ Favorited" : "☆ Favorite"}
-          </button>
-
-          <button
-            class="web-action-btn action-pin"
-            data-pin="${clip.id}"
-          >
-            ${clip.is_pinned ? "📌 Pinned" : "📍 Pin"}
-          </button>
-
-          <button
-            class="web-action-btn action-related"
-            data-related="${clip.id}"
-          >
-            🔗 Related
-          </button>
-
-          <button
-            class="web-action-btn action-delete"
-            data-delete="${clip.id}"
-          >
-            🗑 Delete
-          </button>
-
-        </div>
-
-        ${
-          relatedMap[clip.id]
-            ? `
-              <div class="related-box">
-
-                <h4>
-                  Related Clips
-                </h4>
-
-                ${
-                  relatedMap[clip.id].length
-                    ? relatedMap[clip.id]
-                        .map((item) => `
-                            <div class="related-item">
-
-                              <div class="related-meta">
-                                <span>
-                                  ${(item.clip_type || "text").toUpperCase()}
-                                </span>
-
-                                ${
-                                  item.language
-                                    ? `
-                                      <span>
-                                        ${escapeHtml(item.language)}
-                                      </span>
-                                    `
-                                    : ""
-                                }
-                              </div>
-
-                              ${
-                                item.clip_type === "code"
-                                  ? `
-                                    <pre class="related-code-preview"><code class="language-${getCodeLanguage(
-                                      item
-                                    )}">${escapeHtml(
-                                      item.content.slice(0, 220)
-                                    )}</code></pre>
-                                  `
-                                  : `
-                                    <div class="related-preview">
-                                      ${escapeHtml(
-                                        item.content.slice(0, 140)
-                                      )}
-                                    </div>
-                                  `
-                              }
-
-                              ${
-                                item.tags && item.tags.length
-                                  ? `
-                                    <div class="related-tags">
-                                      ${item.tags.slice(0, 4).map((tag) => `
-                                        <span>
-                                          #${escapeHtml(tag)}
-                                        </span>
-                                      `).join("")}
-                                    </div>
-                                  `
-                                  : ""
-                              }
-
-                              <div class="related-actions">
-
-                                <button
-                                  class="code-btn"
-                                  data-open-related="${item.id}"
-                                >
-                                  Open
-                                </button>
-
-                              </div>
-
-                            </div>
-                          `)
-                        .join("")
-                    : `
-                      <div class="related-item muted">
-                        No related clips found
-                      </div>
-                    `
-                }
-
-              </div>
-            `
-            : ""
+          clip.content_kind === "video"
+            ? ""
+            : renderSourcePreview(clip)
         }
+        ${renderTags(clip)}
+
+        ${renderCollectionSelect(clip)}
+
+        ${renderActions(clip)}
+
+        ${renderRelated(clip)}
 
       </div>
     `)
@@ -441,22 +680,13 @@ list.addEventListener(
     }
 
     if (pinId) {
-
-      await togglePin(
-        pinId
-      );
-
-      showToast(
-        "Pin updated 📌"
-      );
-
+      await togglePin(pinId);
+      showToast("Pin updated 📌");
       await loadClips();
-
       return;
     }
 
     if (openRelatedId) {
-
       const targetCard =
         document.querySelector(
           `[data-id="${openRelatedId}"]`
@@ -466,7 +696,6 @@ list.addEventListener(
         showToast(
           "Clip is not on this page"
         );
-
         return;
       }
 
@@ -489,7 +718,6 @@ list.addEventListener(
     }
 
     if (relatedId) {
-
       if (relatedMap[relatedId]) {
         delete relatedMap[relatedId];
         renderClips(clips);
@@ -564,11 +792,8 @@ list.addEventListener(
 
     if (favId) {
       await toggleFavorite(favId);
-
       showToast("Favorite updated ⭐");
-
       await loadClips();
-
       return;
     }
 
@@ -581,7 +806,6 @@ list.addEventListener(
         );
 
       showToast("Deleted 🗑");
-
       await loadClips();
     }
   }

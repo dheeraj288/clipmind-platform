@@ -1,0 +1,79 @@
+/* ===============================
+   RELATED CLIPS
+================================ */
+
+.related-box{
+  margin-top:16px;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border-soft);
+}
+
+.related-box h4{
+  margin-bottom:10px;
+  color:#d8b4fe;
+  font-size:13px;
+  font-weight:900;
+}
+
+.related-item{
+  margin-bottom:8px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:
+    rgba(3,5,18,.75);
+  color:var(--text-main);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.related-item.muted{
+  color:var(--text-muted);
+}
+
+.related-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:8px;
+  color:#c084fc;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.05em;
+}
+
+.related-preview{
+  color:var(--text-main);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.related-code-preview{
+  max-height:130px;
+  margin:0;
+  padding:12px;
+  overflow:hidden;
+  border-radius:12px;
+  background:#020617;
+  border:1px solid var(--border-soft);
+  font-family:"JetBrains Mono",monospace;
+  font-size:12px;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+
+.related-actions{
+  margin-top:10px;
+}
+
+.focused-card{
+  border-color:
+    rgba(34,197,94,.7)
+    !important;
+
+  box-shadow:
+    0 0 0 1px rgba(34,197,94,.35),
+    0 0 30px rgba(34,197,94,.18)
+    !important;
+}
