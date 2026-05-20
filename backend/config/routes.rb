@@ -18,6 +18,7 @@ Rails.application.routes.draw do
         member do
           patch :toggle_favorite
           patch :increment_copy
+          patch :toggle_pin
           get :related
         end
         collection do

@@ -7,6 +7,7 @@ import {
   getToken,
   logout,
   toggleFavorite,
+  togglePin,
   deleteClip,
   incrementCopy,
   fetchCollections,
@@ -218,34 +219,41 @@ function renderClips(items = []) {
 
         </div>
 
-        <div class="web-card-actions">
+        <div class="web-card-actions premium-actions">
 
           <button
-            class="web-action-btn copy-btn"
+            class="web-action-btn action-copy"
             data-copy="${clip.id}"
           >
-            Copy
+            📋 Copy
           </button>
 
           <button
-            class="web-action-btn fav-btn"
+            class="web-action-btn action-fav"
             data-fav="${clip.id}"
           >
             ${clip.is_favorite ? "⭐ Favorited" : "☆ Favorite"}
           </button>
 
-            <button
-              class="web-action-btn"
-              data-related="${clip.id}"
-            >
-              Related
-            </button>
+          <button
+            class="web-action-btn action-pin"
+            data-pin="${clip.id}"
+          >
+            ${clip.is_pinned ? "📌 Pinned" : "📍 Pin"}
+          </button>
 
           <button
-            class="web-action-btn delete-btn"
+            class="web-action-btn action-related"
+            data-related="${clip.id}"
+          >
+            🔗 Related
+          </button>
+
+          <button
+            class="web-action-btn action-delete"
             data-delete="${clip.id}"
           >
-            Delete
+            🗑 Delete
           </button>
 
         </div>
@@ -392,6 +400,9 @@ list.addEventListener(
     const favId =
       e.target.dataset.fav;
 
+    const pinId =
+      e.target.dataset.pin;
+
     const deleteId =
       e.target.dataset.delete;
 
@@ -425,6 +436,21 @@ list.addEventListener(
         )
           ? "Hide"
           : "Show More";
+
+      return;
+    }
+
+    if (pinId) {
+
+      await togglePin(
+        pinId
+      );
+
+      showToast(
+        "Pin updated 📌"
+      );
+
+      await loadClips();
 
       return;
     }

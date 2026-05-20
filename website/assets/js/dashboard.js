@@ -1,6 +1,7 @@
 import {
   fetchClips,
   fetchTrending,
+  fetchCollections,
   getToken,
   logout,
   toggleFavorite,
@@ -15,6 +16,12 @@ const favoriteClips =
 
 const trendingCount =
   document.getElementById("trending-count");
+
+const collectionsCount =
+  document.getElementById("collections-count");
+
+const topTagsList =
+  document.getElementById("top-tags-list");
 
 const trendingList =
   document.getElementById("trending-list");
@@ -34,8 +41,11 @@ logoutBtn?.addEventListener(
   }
 );
 
-function renderStats(clips, trending) {
-
+function renderStats(
+  clips,
+  trending,
+  collections
+) {
   totalClips.textContent =
     clips.length;
 
@@ -46,6 +56,9 @@ function renderStats(clips, trending) {
 
   trendingCount.textContent =
     trending.length;
+
+  collectionsCount.textContent =
+    collections.length;
 }
 
 function escapeHtml(text = "") {
@@ -73,7 +86,6 @@ function getCodeLanguage(clip) {
 }
 
 function renderTrending(clips) {
-
   if (!clips.length) {
     trendingList.innerHTML = `
       <div class="empty-state">
@@ -86,7 +98,10 @@ function renderTrending(clips) {
 
   trendingList.innerHTML =
     clips.map((clip, index) => `
-      <div class="web-clip-card premium-trend-card" data-id="${clip.id}">
+      <div
+        class="web-clip-card premium-trend-card"
+        data-id="${clip.id}"
+      >
 
         <div class="clip-meta">
           <span class="type-badge">
@@ -114,19 +129,19 @@ function renderTrending(clips) {
             `
         }
 
-          ${
-            clip.tags && clip.tags.length
-              ? `
-                <div class="tag-list">
-                  ${clip.tags.map((tag) => `
-                    <span class="tag-pill">
-                      #${escapeHtml(tag)}
-                    </span>
-                  `).join("")}
-                </div>
-              `
-              : ""
-          }
+        ${
+          clip.tags && clip.tags.length
+            ? `
+              <div class="tag-list">
+                ${clip.tags.map((tag) => `
+                  <span class="tag-pill">
+                    #${escapeHtml(tag)}
+                  </span>
+                `).join("")}
+              </div>
+            `
+            : ""
+        }
 
         <div class="trend-footer">
 
@@ -156,7 +171,8 @@ function renderTrending(clips) {
 
       </div>
     `).join("");
-    if (window.Prism) {
+
+  if (window.Prism) {
     Prism.highlightAllUnder(trendingList);
   }
 }
@@ -164,7 +180,6 @@ function renderTrending(clips) {
 trendingList?.addEventListener(
   "click",
   async (e) => {
-
     const copyId =
       e.target.dataset.copy;
 
@@ -172,16 +187,23 @@ trendingList?.addEventListener(
       e.target.dataset.fav;
 
     if (copyId) {
-      const card =
-        e.target.closest(".web-clip-card");
+      const clip =
+        Array.from(
+          trendingList.querySelectorAll(
+            ".web-clip-card"
+          )
+        ).find(
+          (card) =>
+            card.dataset.id === String(copyId)
+        );
 
-      const content =
-        card.querySelector(".clip-content")
-          ?.textContent
-          ?.trim();
+      const original =
+        clip?.querySelector(
+          ".clip-content, .web-code-block"
+        );
 
       await navigator.clipboard.writeText(
-        content || ""
+        original?.textContent?.trim() || ""
       );
 
       await incrementCopy(copyId);
@@ -198,15 +220,20 @@ trendingList?.addEventListener(
   }
 );
 
+
+
+
 async function loadDashboard() {
-
   try {
-
-    const clipsResponse =
-      await fetchClips();
-
-    const trending =
-      await fetchTrending();
+    const [
+      clipsResponse,
+      trending,
+      collections,
+    ] = await Promise.all([
+      fetchClips(),
+      fetchTrending(),
+      fetchCollections(),
+    ]);
 
     const clips =
       Array.isArray(clipsResponse)
@@ -215,15 +242,17 @@ async function loadDashboard() {
 
     renderStats(
       clips,
-      trending
+      trending,
+      collections
     );
+
+    renderTopTags(clips);
 
     renderTrending(
       trending
     );
 
   } catch (err) {
-
     console.error(err);
 
     trendingList.innerHTML = `
@@ -234,4 +263,39 @@ async function loadDashboard() {
   }
 }
 
+function renderTopTags(clips = []) {
+  if (!topTagsList) return;
+  const tagCounts = {};
+
+  clips.forEach((clip) => {
+    (clip.tags || []).forEach((tag) => {
+      tagCounts[tag] =
+        (tagCounts[tag] || 0) + 1;
+    });
+  });
+
+  const topTags =
+    Object.entries(tagCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+
+  if (!topTags.length) {
+    topTagsList.innerHTML = `
+      <div class="empty-state">
+        No tags yet
+      </div>
+    `;
+    return;
+  }
+
+  topTagsList.innerHTML =
+    topTags.map(([tag, count]) => `
+      <div class="top-tag-card">
+        <span>#${escapeHtml(tag)}</span>
+        <strong>${count} clip </strong>
+      </div>
+    `).join("");
+}
+
 loadDashboard();
+

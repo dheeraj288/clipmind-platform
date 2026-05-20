@@ -247,3 +247,12 @@ export async function fetchRelatedClips(id) {
     `/clips/${id}/related`
   );
 }
+
+export async function togglePin(id) {
+  return request(
+    `/clips/${id}/toggle_pin`,
+    {
+      method: "PATCH",
+    }
+  );
+} 

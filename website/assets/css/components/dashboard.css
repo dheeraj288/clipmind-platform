@@ -18,11 +18,16 @@
 }
 
 .stats-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-
+  display:grid !important;
+  grid-template-columns:repeat(2, 1fr) !important;
+  gap:18px !important;
   margin-bottom:28px;
+}
+
+@media(max-width:900px){
+  .stats-grid{
+    grid-template-columns:1fr !important;
+  }
 }
 
 .dashboard-section{
