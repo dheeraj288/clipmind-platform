@@ -13,6 +13,7 @@ import {
   updateClip,
   bulkUpdateClips,
   bulkDeleteClips,
+  fetchRelatedClips,
 } from "./api.js";
 
 const list =
@@ -37,6 +38,7 @@ const bulkCollectionSelect =
 let clips = [];
 let collections = [];
 let selectedClipIds = [];
+let relatedMap = {};
 
 if (!getToken()) {
   window.location.href =
@@ -232,6 +234,13 @@ function renderClips(items = []) {
             ${clip.is_favorite ? "⭐ Favorited" : "☆ Favorite"}
           </button>
 
+            <button
+              class="web-action-btn"
+              data-related="${clip.id}"
+            >
+              Related
+            </button>
+
           <button
             class="web-action-btn delete-btn"
             data-delete="${clip.id}"
@@ -240,6 +249,95 @@ function renderClips(items = []) {
           </button>
 
         </div>
+
+        ${
+          relatedMap[clip.id]
+            ? `
+              <div class="related-box">
+
+                <h4>
+                  Related Clips
+                </h4>
+
+                ${
+                  relatedMap[clip.id].length
+                    ? relatedMap[clip.id]
+                        .map((item) => `
+                            <div class="related-item">
+
+                              <div class="related-meta">
+                                <span>
+                                  ${(item.clip_type || "text").toUpperCase()}
+                                </span>
+
+                                ${
+                                  item.language
+                                    ? `
+                                      <span>
+                                        ${escapeHtml(item.language)}
+                                      </span>
+                                    `
+                                    : ""
+                                }
+                              </div>
+
+                              ${
+                                item.clip_type === "code"
+                                  ? `
+                                    <pre class="related-code-preview"><code class="language-${getCodeLanguage(
+                                      item
+                                    )}">${escapeHtml(
+                                      item.content.slice(0, 220)
+                                    )}</code></pre>
+                                  `
+                                  : `
+                                    <div class="related-preview">
+                                      ${escapeHtml(
+                                        item.content.slice(0, 140)
+                                      )}
+                                    </div>
+                                  `
+                              }
+
+                              ${
+                                item.tags && item.tags.length
+                                  ? `
+                                    <div class="related-tags">
+                                      ${item.tags.slice(0, 4).map((tag) => `
+                                        <span>
+                                          #${escapeHtml(tag)}
+                                        </span>
+                                      `).join("")}
+                                    </div>
+                                  `
+                                  : ""
+                              }
+
+                              <div class="related-actions">
+
+                                <button
+                                  class="code-btn"
+                                  data-open-related="${item.id}"
+                                >
+                                  Open
+                                </button>
+
+                              </div>
+
+                            </div>
+                          `)
+                        .join("")
+                    : `
+                      <div class="related-item muted">
+                        No related clips found
+                      </div>
+                    `
+                }
+
+              </div>
+            `
+            : ""
+        }
 
       </div>
     `)
@@ -300,6 +398,12 @@ list.addEventListener(
     const toggleId =
       e.target.dataset.toggle;
 
+    const relatedId =
+      e.target.dataset.related;
+
+    const openRelatedId =
+      e.target.dataset.openRelated;
+
     const copyCodeId =
       e.target.dataset.copyCode;
 
@@ -321,6 +425,66 @@ list.addEventListener(
         )
           ? "Hide"
           : "Show More";
+
+      return;
+    }
+
+    if (openRelatedId) {
+
+      const targetCard =
+        document.querySelector(
+          `[data-id="${openRelatedId}"]`
+        );
+
+      if (!targetCard) {
+        showToast(
+          "Clip is not on this page"
+        );
+
+        return;
+      }
+
+      targetCard.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      targetCard.classList.add(
+        "focused-card"
+      );
+
+      setTimeout(() => {
+        targetCard.classList.remove(
+          "focused-card"
+        );
+      }, 1400);
+
+      return;
+    }
+
+    if (relatedId) {
+
+      if (relatedMap[relatedId]) {
+        delete relatedMap[relatedId];
+        renderClips(clips);
+        return;
+      }
+
+      const related =
+        await fetchRelatedClips(
+          relatedId
+        );
+
+      relatedMap[relatedId] =
+        related;
+
+      renderClips(clips);
+
+      showToast(
+        related.length
+          ? `Related found: ${related.length}`
+          : "No related clips"
+      );
 
       return;
     }
@@ -515,14 +679,40 @@ search?.addEventListener(
     const query =
       e.target.value
         .toLowerCase()
-        .trim();
+        .trim()
+        .replace("#", "");
 
     const filtered =
-      clips.filter((clip) =>
-        clip.content
-          ?.toLowerCase()
-          .includes(query)
-      );
+      clips.filter((clip) => {
+        const contentMatch =
+          clip.content
+            ?.toLowerCase()
+            .includes(query);
+
+        const tagMatch =
+          (clip.tags || []).some((tag) =>
+            tag
+              .toLowerCase()
+              .includes(query)
+          );
+
+        const languageMatch =
+          clip.language
+            ?.toLowerCase()
+            .includes(query);
+
+        const typeMatch =
+          clip.clip_type
+            ?.toLowerCase()
+            .includes(query);
+
+        return (
+          contentMatch ||
+          tagMatch ||
+          languageMatch ||
+          typeMatch
+        );
+      });
 
     renderClips(filtered);
   }

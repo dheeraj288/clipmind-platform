@@ -241,3 +241,9 @@ export async function bulkDeleteClips(
     }
   );
 }
+
+export async function fetchRelatedClips(id) {
+  return request(
+    `/clips/${id}/related`
+  );
+}

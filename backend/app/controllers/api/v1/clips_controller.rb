@@ -244,6 +244,49 @@ def bulk_delete
   }
 end
 
+
+def related
+
+  clip =
+    current_user.clips.find(
+      params[:id]
+    )
+
+  related_clips =
+    current_user.clips
+                .where
+                .not(
+                  id: clip.id
+                )
+                .select do |item|
+
+      same_language =
+        item.language ==
+        clip.language
+
+      same_collection =
+        item.collection_id ==
+        clip.collection_id
+
+      common_tags =
+        (
+          item.tags || []
+        ) &
+        (
+          clip.tags || []
+        )
+
+      same_language ||
+      same_collection ||
+      common_tags.any?
+
+    end
+
+  render json:
+    related_clips.first(5)
+
+end
+
 private
 
   def set_clip
