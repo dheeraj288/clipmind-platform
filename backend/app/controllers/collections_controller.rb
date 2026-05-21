@@ -4,6 +4,8 @@ class CollectionsController < ApplicationController
   def index
     user = User.first
 
+    @collection = Collection.new
+
     @collections =
       user
         &.collections
@@ -23,5 +25,23 @@ class CollectionsController < ApplicationController
         .clips
         .active
         .order(is_pinned: :desc, created_at: :desc)
+  end
+
+  def create
+    user = User.first
+
+    @collection = user.collections.new(collection_params)
+
+    if @collection.save
+      redirect_to collections_path
+    else
+      redirect_to collections_path, alert: "Collection name can't be blank"
+    end
+  end
+
+  private
+
+  def collection_params
+    params.require(:collection).permit(:name)
   end
 end

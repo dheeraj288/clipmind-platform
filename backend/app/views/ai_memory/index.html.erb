@@ -1,0 +1,135 @@
+<div class="space-y-8">
+
+  <section class="rounded-3xl border border-fuchsia-500/20 bg-gradient-to-br from-fuchsia-950/50 via-slate-900 to-cyan-950/30 p-8">
+
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+
+      <div>
+        <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-fuchsia-500/20 text-fuchsia-300">
+          <%= render "shared/sidebar_icon", name: "prompts" %>
+        </div>
+
+        <h1 class="text-3xl font-bold text-white">
+          AI Memory
+        </h1>
+
+        <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
+          ClipMind learns from your copy behavior and keeps your most useful clipboard items ready.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div class="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 text-center">
+          <p class="text-2xl font-bold text-white"><%= @memory_clips.count %></p>
+          <p class="mt-1 text-xs text-slate-500">Memory</p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 text-center">
+          <p class="text-2xl font-bold text-white"><%= @favorite_memory.count %></p>
+          <p class="mt-1 text-xs text-slate-500">Favorites</p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 text-center">
+          <p class="text-2xl font-bold text-white"><%= @recent_memory.count %></p>
+          <p class="mt-1 text-xs text-slate-500">Recent</p>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+    <div class="mb-4 flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-bold text-white">Most Used Memory</h2>
+        <p class="mt-1 text-sm text-slate-400">Clips ranked by copy count.</p>
+      </div>
+    </div>
+
+    <% if @memory_clips.any? %>
+      <div class="grid gap-4 xl:grid-cols-2">
+        <% @memory_clips.each do |clip| %>
+          <%= render "shared/clip_card", clip: clip %>
+        <% end %>
+      </div>
+    <% else %>
+      <%= render "shared/empty_state",
+          icon: "🧠",
+          title: "No memory yet",
+          message: "Jab clips copy karoge to useful clips AI Memory me appear honge." %>
+    <% end %>
+  </section>
+
+
+  <section class="grid gap-4 xl:grid-cols-2">
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+      <h2 class="text-lg font-bold text-white">Favorite Memory</h2>
+
+      <div class="mt-4 space-y-3">
+        <% if @favorite_memory.any? %>
+          <% @favorite_memory.each do |clip| %>
+            <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+              <p class="text-sm font-semibold text-white">
+                <%= clip.title.presence || clip.clip_type.to_s.titleize %>
+              </p>
+
+              <p class="mt-2 line-clamp-2 text-xs leading-5 text-slate-400">
+                <%= clip.content %>
+              </p>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-slate-500">No favorite memory yet.</p>
+        <% end %>
+      </div>
+    </div>
+
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+      <h2 class="text-lg font-bold text-white">Recent Memory</h2>
+
+      <div class="mt-4 space-y-3">
+        <% if @recent_memory.any? %>
+          <% @recent_memory.each do |clip| %>
+            <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+              <p class="text-sm font-semibold text-white">
+                <%= clip.title.presence || clip.clip_type.to_s.titleize %>
+              </p>
+
+              <p class="mt-2 line-clamp-2 text-xs leading-5 text-slate-400">
+                <%= clip.content %>
+              </p>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-slate-500">No recent memory yet.</p>
+        <% end %>
+      </div>
+    </div>
+
+  </section>
+
+
+  <section class="rounded-2xl border border-fuchsia-500/20 bg-slate-900 p-6">
+
+    <div class="flex gap-4">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-fuchsia-500/20 text-fuchsia-300">
+        <%= render "shared/sidebar_icon", name: "prompts" %>
+      </div>
+
+      <div>
+        <h2 class="font-bold text-white">Smart Memory Engine</h2>
+
+        <p class="mt-2 text-sm leading-6 text-slate-400">
+          Later we will connect semantic search, embeddings and AI summaries here.
+          For now, ClipMind uses copy frequency, favorites and recent activity.
+        </p>
+      </div>
+    </div>
+
+  </section>
+
+</div>

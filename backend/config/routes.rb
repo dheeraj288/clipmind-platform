@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'ai_memory/index'
   get 'favorites/index'
   get 'collections/index'
   get 'collections/show'
@@ -6,8 +7,19 @@ Rails.application.routes.draw do
   root "home#index"
 
   get "dashboard", to: "dashboard#index", as: :dashboard
-  get "clips", to: "clips#index", as: :clips
-  resources :collections, only: [:index, :show]
+  resources :clips, only: [:index] do
+    member do
+      patch :toggle_favorite
+      patch :update_collection
+      patch :increment_copy
+    end
+  end
+
+  get "ai_search", to: "ai_search#index", as: :ai_search
+  get "ai_memory", to: "ai_memory#index", as: :ai_memory
+
+  resources :collections, only: [:index, :show, :create]
+  
   get "favorites", to: "favorites#index"
 
   namespace :api do

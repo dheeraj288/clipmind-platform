@@ -1,4 +1,5 @@
 <div class="rounded-3xl border border-slate-800 bg-slate-900 p-5">
+
   <div class="mb-3 flex items-start justify-between gap-4">
     <div>
       <h3 class="text-base font-bold text-white">
@@ -11,36 +12,90 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <% if clip.is_favorite? %>
-        <span class="text-lg">⭐</span>
+
+      <%= button_to toggle_favorite_clip_path(clip),
+          method: :patch,
+          class: "rounded-full px-3 py-1 text-sm #{clip.is_favorite? ? 'bg-fuchsia-500/20 text-fuchsia-300' : 'bg-slate-800 text-slate-400 hover:text-white'}" do %>
+
+        <%= clip.is_favorite? ? "★" : "☆" %>
+
       <% end %>
 
       <span class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">
         <%= clip.clip_type %>
       </span>
+
     </div>
   </div>
 
-  <% if ["code", "json", "command"].include?(clip.clip_type.to_s) %>
+
+  <% if ["code","json","command"].include?(clip.clip_type.to_s) %>
+
     <pre class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300"><code><%= clip.content %></code></pre>
+
   <% else %>
+
     <p class="rounded-2xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">
       <%= clip.content %>
     </p>
+
   <% end %>
 
+
   <div class="mt-4 flex flex-wrap gap-2">
-    <button
-      type="button"
+
+    <div
       data-controller="clips"
-      data-action="click->clips#copy"
-      data-clips-content-value="<%= clip.content %>"
-      class="rounded-xl border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800">
-      Copy
-    </button>
+      data-clips-content-value="<%= clip.content %>">
+
+      <%= button_to increment_copy_clip_path(clip),
+          method: :patch,
+          form: {
+            data: {
+              action: "submit->clips#copy"
+            }
+          },
+          class: "rounded-xl border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800" do %>
+        Copy
+      <% end %>
+
+    </div>
 
     <span class="rounded-xl border border-slate-800 px-4 py-2 text-xs text-slate-500">
       Copies: <%= clip.copy_count || 0 %>
     </span>
+
   </div>
+
+
+  <% if defined?(@collections) && @collections.any? %>
+
+    <div class="mt-4 border-t border-slate-800 pt-4">
+
+      <%= form_with model: clip,
+          url: update_collection_clip_path(clip),
+          method: :patch,
+          local: true,
+          data: { turbo: false },
+          class: "grid gap-3 sm:grid-cols-[1fr_100px]" do |form| %>
+
+        <%= form.select :collection_id,
+            options_from_collection_for_select(
+              @collections,
+              :id,
+              :name,
+              clip.collection_id
+            ),
+            { include_blank: "No Collection" },
+            class: "rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white outline-none focus:border-fuchsia-500" %>
+
+        <%= form.submit "Save",
+            class: "cursor-pointer rounded-xl bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-fuchsia-600 hover:text-white" %>
+
+      <% end %>
+
+    </div>
+
+  <% end %>
+
 </div>

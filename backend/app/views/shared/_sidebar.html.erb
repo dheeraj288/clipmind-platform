@@ -42,10 +42,16 @@
         <span>Favorites</span>
     <% end %>
 
-    <%= link_to "#",
-        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-900 hover:text-white" do %>
+    <%= link_to ai_search_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'ai_search' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
       <%= render "shared/sidebar_icon", name: "search" %>
       <span>AI Search</span>
+    <% end %>
+
+    <%= link_to ai_memory_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'ai_memory' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
+      <%= render "shared/sidebar_icon", name: "prompts" %>
+      <span>AI Memory</span>
     <% end %>
   </nav>
 

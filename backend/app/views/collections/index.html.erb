@@ -7,11 +7,9 @@
         Organize your clips into smart groups and reusable workspaces.
       </p>
     </div>
-
-    <button class="rounded-xl bg-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-fuchsia-600/30 hover:bg-fuchsia-500">
-      + New Collection
-    </button>
   </section>
+
+  <%= render "shared/collection_form", collection: @collection %>
 
   <% if @collections.any? %>
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -25,6 +23,6 @@
     <%= render "shared/empty_state",
         icon: "📚",
         title: "No collections yet",
-        message: "Collections create karoge to clips ko groups me organize kar paoge." %>
+        message: "Collection create karoge to clips ko groups me organize kar paoge." %>
   <% end %>
 </div>

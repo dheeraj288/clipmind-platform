@@ -8,4 +8,4 @@ export default class extends Controller {
   copy() {
     navigator.clipboard.writeText(this.contentValue)
   }
-}
+};
