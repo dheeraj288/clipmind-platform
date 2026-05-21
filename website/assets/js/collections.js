@@ -100,9 +100,6 @@ function renderCollections(items = []) {
               📚
             </div>
 
-            <button
-              <button
-                <button
                   <button
                     type="button"
                     class="pin-icon-btn ${pinClass}"

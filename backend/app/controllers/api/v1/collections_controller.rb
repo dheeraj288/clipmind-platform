@@ -5,13 +5,19 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       current_user
         .collections
         .left_joins(:clips)
+        .where(
+          "clips.id IS NULL OR clips.deleted_at IS NULL"
+        )
         .select(
           "collections.*",
           "COUNT(clips.id) AS clips_count",
           "COALESCE(SUM(clips.copy_count), 0) AS total_copies"
         )
         .group("collections.id")
-        .order(is_pinned: :desc,created_at: :desc)
+        .order(
+          is_pinned: :desc,
+          created_at: :desc
+        )
 
     render json: collections.as_json(
       methods: [

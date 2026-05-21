@@ -233,6 +233,7 @@ class Api::V1::ClipsController < Api::V1::BaseController
 
     related_clips =
       current_user.clips
+                  .active
                   .where.not(id: clip.id)
                   .select do |item|
 
