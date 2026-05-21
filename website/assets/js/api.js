@@ -115,6 +115,52 @@ export async function loginUser(
   return data;
 }
 
+
+export async function signupUser(
+  name,
+  email,
+  password,
+  passwordConfirmation
+) {
+  const response =
+    await fetch(
+      `${API_BASE_URL}/signup`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify({
+          user: {
+            name,
+            email,
+            password,
+            password_confirmation:
+              passwordConfirmation,
+          },
+        }),
+      }
+    );
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.errors?.[0] ||
+      data.error ||
+      "Signup failed"
+    );
+  }
+
+  setToken(data.token);
+
+  return data;
+}
+
 /* FETCH CLIPS */
 export async function fetchClips() {
 
