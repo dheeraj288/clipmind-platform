@@ -64,6 +64,21 @@ class ClipsController < ApplicationController
     end
   end
 
+ def destroy
+  @clip = Clip.find(params[:id])
+  @clip.update!(deleted_at: Time.current)
+
+  respond_to do |format|
+    format.turbo_stream do
+      render turbo_stream: turbo_stream.remove(@clip)
+    end
+
+    format.html do
+      redirect_back fallback_location: clips_path, notice: "Clip deleted successfully."
+    end
+  end
+end
+
   def update_collection
     user = User.first
     @clip = user.clips.find(params[:id])

@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   root "home#index"
 
   get "dashboard", to: "dashboard#index", as: :dashboard
-  resources :clips, only: [:index] do
+  resources :clips, only: [:index, :destroy] do
     member do
       patch :toggle_favorite
       patch :update_collection
