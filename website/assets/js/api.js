@@ -21,6 +21,10 @@ export function logout() {
     "token"
   );
 
+  localStorage.removeItem(
+    "currentUser"
+  );
+
   window.location.href =
     "login.html";
 }

@@ -8,6 +8,12 @@ import {
   incrementCopy,
 } from "./api.js";
 
+import {
+  requireAuth,
+} from "./auth.js";
+
+requireAuth();
+
 const totalClips =
   document.getElementById("total-clips");
 

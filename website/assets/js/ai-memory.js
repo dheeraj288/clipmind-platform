@@ -7,6 +7,12 @@ import {
 } from "./api.js";
 
 import {
+  requireAuth,
+} from "./auth.js";
+
+requireAuth();
+
+import {
   showToast,
 } from "./toast.js";
 

@@ -2,11 +2,10 @@
 @import url("./core/base.css");
 
 @import url("./components/sidebar.css");
-@import url("./components/cards.css");
 @import url("./components/dashboard.css");
 
-@import url("./components/stats.css");
 @import url("./components/cards.css");
+@import url("./components/stats.css");
 @import url("./components/buttons.css");
 @import url("./components/code.css");
 @import url("./components/collections.css");
@@ -15,4 +14,3 @@
 @import url("./components/source-preview.css");
 @import url("./components/related.css");
 @import url("./components/login.css");
-@import url("./components/signup.css");

@@ -3,6 +3,12 @@ import {
   getToken,
 } from "./api.js";
 
+import {
+  redirectIfLoggedIn,
+} from "./auth.js";
+
+redirectIfLoggedIn();
+
 const form =
   document.getElementById("login-form");
 

@@ -7,6 +7,12 @@ import {
   incrementCopy,
 } from "./api.js";
 
+import {
+  requireAuth,
+} from "./auth.js";
+
+requireAuth();
+
 const list =
   document.getElementById(
     "favorites-list"

@@ -3,6 +3,12 @@ import {
 } from "./toast.js";
 
 import {
+  requireAuth,
+} from "./auth.js";
+
+requireAuth();
+
+import {
   fetchClips,
   getToken,
   logout,
