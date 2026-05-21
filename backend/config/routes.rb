@@ -1,12 +1,13 @@
 Rails.application.routes.draw do
-  root "dashboard#index"
+  root "home#index"
+
   get "dashboard", to: "dashboard#index"
+
   namespace :api do
     namespace :v1 do
-      post :signup, to: 'auth#signup'
-      post :login,  to: 'auth#login'
-      get  :me,     to: 'auth#me'
-
+      post :signup, to: "auth#signup"
+      post :login,  to: "auth#login"
+      get  :me,     to: "auth#me"
 
       resources :collections do
         member do
@@ -21,10 +22,10 @@ Rails.application.routes.draw do
           patch :toggle_pin
           get :related
         end
+
         collection do
           get :trending
           get :ai_memory
-          
           patch :bulk_update
           delete :bulk_delete
         end

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ClipMind</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+    <div class="flex min-h-screen">
+
+      <!-- SIDEBAR -->
+      <aside class="hidden w-72 shrink-0 border-r border-slate-800 bg-slate-900/80 px-5 py-6 lg:block">
+        <div class="mb-8">
+          <div class="flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-500 text-lg font-bold text-white shadow-lg shadow-indigo-500/30">
+              C
+            </div>
+
+            <div>
+              <h1 class="text-xl font-bold tracking-tight text-white">
+                ClipMind
+              </h1>
+              <p class="text-xs text-slate-400">
+                AI Clipboard Workspace
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <nav class="space-y-2">
+          <%= link_to root_path, class: "flex items-center gap-3 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-medium text-white" do %>
+            <span>🏠</span>
+            <span>Dashboard</span>
+          <% end %>
+
+          <%= link_to "#", class: "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white" do %>
+            <span>📋</span>
+            <span>All Clips</span>
+          <% end %>
+
+          <%= link_to "#", class: "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white" do %>
+            <span>⭐</span>
+            <span>Favorites</span>
+          <% end %>
+
+          <%= link_to "#", class: "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white" do %>
+            <span>🔥</span>
+            <span>Trending</span>
+          <% end %>
+
+          <%= link_to "#", class: "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white" do %>
+            <span>🧠</span>
+            <span>AI Memory</span>
+          <% end %>
+        </nav>
+
+        <div class="mt-10 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+          <p class="text-xs font-medium text-slate-300">
+            Migration Status
+          </p>
+          <p class="mt-1 text-sm text-slate-500">
+            Rails + Hotwire + Stimulus + Tailwind
+          </p>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="flex min-w-0 flex-1 flex-col">
+        <header class="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/90 px-6 py-4 backdrop-blur">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-semibold text-white">
+                Dashboard
+              </h2>
+              <p class="text-sm text-slate-400">
+                Manage your clips, favorites and AI memory
+              </p>
+            </div>
+
+            <div class="hidden rounded-full border border-slate-800 bg-slate-900 px-4 py-2 text-sm text-slate-300 sm:block">
+              Hotwire Ready
+            </div>
+          </div>
+        </header>
+
+        <section class="flex-1 p-6">
+          <%= yield %>
+        </section>
+      </main>
+
+    </div>
+  </body>
+</html>
