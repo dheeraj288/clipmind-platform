@@ -4,6 +4,8 @@ class FavoritesController < ApplicationController
   def index
     user = User.first
 
+    @collections = user&.collections&.order(:name) || Collection.none
+
     @favorites =
       user
         &.clips

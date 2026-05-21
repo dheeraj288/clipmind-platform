@@ -1,14 +1,22 @@
-<div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-  <h2 class="mb-4 text-lg font-bold text-white">
-    Create New Collection
-  </h2>
+<%= turbo_frame_tag "collection_form" do %>
+  <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+    <h2 class="mb-4 text-lg font-bold text-white">
+      Create New Collection
+    </h2>
 
-  <%= form_with model: collection, url: collections_path, method: :post, class: "grid gap-4 lg:grid-cols-[1fr_160px]" do |form| %>
-    <%= form.text_field :name,
-        placeholder: "Collection name...",
-        class: "rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-fuchsia-500" %>
+    <% if collection.errors.any? %>
+      <div class="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+        <%= collection.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
 
-    <%= form.submit "Create",
-        class: "cursor-pointer rounded-xl bg-fuchsia-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-600/30 hover:bg-fuchsia-500" %>
-  <% end %>
-</div>
+    <%= form_with model: collection, url: collections_path, method: :post, class: "grid gap-4 lg:grid-cols-[1fr_160px]" do |form| %>
+      <%= form.text_field :name,
+          placeholder: "Collection name...",
+          class: "rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-fuchsia-500" %>
+
+      <%= form.submit "Create",
+          class: "cursor-pointer rounded-xl bg-fuchsia-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-600/30 hover:bg-fuchsia-500" %>
+    <% end %>
+  </div>
+<% end %>

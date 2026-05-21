@@ -1,0 +1,16 @@
+<%= turbo_frame_tag "collections_list" do %>
+  <% if collections.any? %>
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <% collections.each_with_index do |collection, index| %>
+        <%= render "shared/collection_card",
+            collection: collection,
+            index: index %>
+      <% end %>
+    </section>
+  <% else %>
+    <%= render "shared/empty_state",
+        icon: "📚",
+        title: "No collections yet",
+        message: "Collection create karoge to clips ko groups me organize kar paoge." %>
+  <% end %>
+<% end %>

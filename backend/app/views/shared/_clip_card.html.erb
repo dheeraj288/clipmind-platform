@@ -1,4 +1,4 @@
-<div class="rounded-3xl border border-slate-800 bg-slate-900 p-5">
+<div id="<%= dom_id(clip) %>" class="rounded-3xl border border-slate-800 bg-slate-900 p-5">
 
   <div class="mb-3 flex items-start justify-between gap-4">
     <div>
@@ -16,9 +16,7 @@
       <%= button_to toggle_favorite_clip_path(clip),
           method: :patch,
           class: "rounded-full px-3 py-1 text-sm #{clip.is_favorite? ? 'bg-fuchsia-500/20 text-fuchsia-300' : 'bg-slate-800 text-slate-400 hover:text-white'}" do %>
-
         <%= clip.is_favorite? ? "★" : "☆" %>
-
       <% end %>
 
       <span class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">
@@ -29,20 +27,16 @@
   </div>
 
 
-  <% if ["code","json","command"].include?(clip.clip_type.to_s) %>
-
-    <pre class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300"><code><%= clip.content %></code></pre>
-
+  <% if ["code", "json", "command"].include?(clip.clip_type.to_s) %>
+    <pre class="max-h-72 overflow-auto rounded-2xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300"><code><%= clip.content %></code></pre>
   <% else %>
-
     <p class="rounded-2xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">
       <%= clip.content %>
     </p>
-
   <% end %>
 
 
-  <div class="mt-4 flex flex-wrap gap-2">
+  <div class="mt-4 flex flex-wrap items-center gap-2">
 
     <div
       data-controller="clips"
@@ -65,6 +59,12 @@
       Copies: <%= clip.copy_count || 0 %>
     </span>
 
+    <% if clip.collection.present? %>
+      <span class="rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/10 px-4 py-2 text-xs text-fuchsia-200">
+        <%= clip.collection.name %>
+      </span>
+    <% end %>
+
   </div>
 
 
@@ -75,8 +75,6 @@
       <%= form_with model: clip,
           url: update_collection_clip_path(clip),
           method: :patch,
-          local: true,
-          data: { turbo: false },
           class: "grid gap-3 sm:grid-cols-[1fr_100px]" do |form| %>
 
         <%= form.select :collection_id,
