@@ -1,0 +1,59 @@
+<div class="space-y-8">
+
+  <section class="flex items-end justify-between">
+
+    <div>
+      <h1 class="text-2xl font-bold text-white">
+        Favorites
+      </h1>
+
+      <p class="mt-2 text-sm text-slate-400">
+        Your starred clipboard items.
+      </p>
+    </div>
+
+    <div class="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300">
+      <%= pluralize(@favorites.count, "favorite") %>
+    </div>
+
+  </section>
+
+  <section class="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+
+    <div class="grid gap-4 lg:grid-cols-[1fr_200px]">
+
+      <input
+        type="text"
+        placeholder="Search favorites..."
+        class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none"
+      >
+
+      <select
+        class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white"
+      >
+        <option>Recently Added</option>
+        <option>Oldest</option>
+      </select>
+
+    </div>
+
+  </section>
+
+  <% if @favorites.any? %>
+
+    <section class="grid gap-4 xl:grid-cols-2">
+      <% @favorites.each do |clip| %>
+        <%= render "shared/favorite_card", clip: clip %>
+      <% end %>
+    </section>
+
+  <% else %>
+
+    <%= render "shared/empty_state",
+        icon: "⭐",
+        title: "No favorites yet",
+        message: "Favorite clips yaha show honge." %>
+
+  <% end %>
+
+</div>

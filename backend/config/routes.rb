@@ -1,7 +1,14 @@
 Rails.application.routes.draw do
+  get 'favorites/index'
+  get 'collections/index'
+  get 'collections/show'
+  get 'clips/index'
   root "home#index"
 
-  get "dashboard", to: "dashboard#index"
+  get "dashboard", to: "dashboard#index", as: :dashboard
+  get "clips", to: "clips#index", as: :clips
+  resources :collections, only: [:index, :show]
+  get "favorites", to: "favorites#index"
 
   namespace :api do
     namespace :v1 do

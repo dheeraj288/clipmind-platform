@@ -1,0 +1,65 @@
+<aside class="hidden w-64 shrink-0 border-r border-slate-800 bg-slate-950 lg:flex lg:flex-col">
+  <div class="flex h-16 items-center justify-between border-b border-slate-800 px-5">
+    <%= link_to dashboard_path, class: "flex items-center gap-3" do %>
+      <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-600 to-cyan-400 text-white shadow-lg shadow-fuchsia-600/30">
+        ✨
+      </div>
+
+      <span class="font-bold text-white">ClipMind</span>
+    <% end %>
+
+    <button class="text-slate-500 hover:text-white">‹</button>
+  </div>
+
+  <nav class="flex-1 space-y-2 px-4 py-5">
+    <%= link_to dashboard_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{current_page?(dashboard_path) ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
+      <%= render "shared/sidebar_icon", name: "dashboard" %>
+      <span>Dashboard</span>
+    <% end %>
+
+    <%= link_to clips_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{current_page?(clips_path) ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
+      <%= render "shared/sidebar_icon", name: "clips" %>
+      <span>Clips</span>
+    <% end %>
+
+    <%= link_to collections_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'collections' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
+      <%= render "shared/sidebar_icon", name: "collections" %>
+      <span>Collections</span>
+    <% end %>
+
+    <%= link_to "#",
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-900 hover:text-white" do %>
+      <%= render "shared/sidebar_icon", name: "prompts" %>
+      <span>Prompts</span>
+    <% end %>
+
+    <%= link_to favorites_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'favorites' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
+        <%= render "shared/sidebar_icon", name: "favorites" %>
+        <span>Favorites</span>
+    <% end %>
+
+    <%= link_to "#",
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-900 hover:text-white" do %>
+      <%= render "shared/sidebar_icon", name: "search" %>
+      <span>AI Search</span>
+    <% end %>
+  </nav>
+
+  <div class="space-y-2 border-t border-slate-800 px-4 py-5">
+    <%= link_to "#",
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-900 hover:text-white" do %>
+      <%= render "shared/sidebar_icon", name: "settings" %>
+      <span>Settings</span>
+    <% end %>
+
+    <%= link_to "#",
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-900 hover:text-white" do %>
+      <%= render "shared/sidebar_icon", name: "profile" %>
+      <span>Profile</span>
+    <% end %>
+  </div>
+</aside>
