@@ -71,13 +71,11 @@ function renderCollections(items = []) {
         No collections yet 📚
       </div>
     `;
-
     return;
   }
 
   list.innerHTML = items
     .map((collection) => {
-
       const pinnedClass =
         collection.is_pinned
           ? "pinned-card"
@@ -100,18 +98,18 @@ function renderCollections(items = []) {
               📚
             </div>
 
-                  <button
-                    type="button"
-                    class="pin-icon-btn ${pinClass}"
-                    data-pin="${collection.id}"
-                    title="${
-                      collection.is_pinned
-                        ? "Unpin collection"
-                        : "Pin collection"
-                    }"
-                  >
-                    📌
-                  </button>
+            <button
+              type="button"
+              class="pin-icon-btn ${pinClass}"
+              data-pin="${collection.id}"
+              title="${
+                collection.is_pinned
+                  ? "Unpin collection"
+                  : "Pin collection"
+              }"
+            >
+              📌
+            </button>
 
           </div>
 
@@ -143,9 +141,8 @@ function renderCollections(items = []) {
         </a>
       `;
     })
-    .join("");
+  .join("");
 }
-
 search?.addEventListener(
   "input",
   (e) => {

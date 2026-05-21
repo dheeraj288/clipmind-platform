@@ -113,3 +113,70 @@
   overflow-y:auto;
   overflow-x:hidden;
 }
+
+
+.sidebar-profile{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  margin-top:auto;
+  margin-bottom:14px;
+
+  padding:12px;
+
+  border-radius:16px;
+
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border-soft);
+}
+
+.profile-avatar{
+  width:36px;
+  height:36px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:12px;
+
+  background:var(--gradient-purple);
+
+  color:white;
+
+  font-size:15px;
+  font-weight:900;
+
+  flex-shrink:0;
+}
+
+.profile-info{
+  min-width:0;
+}
+
+.profile-info strong{
+  display:block;
+
+  color:white;
+
+  font-size:13px;
+  font-weight:900;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.profile-info span{
+  display:block;
+
+  color:var(--text-muted);
+
+  font-size:11px;
+  font-weight:700;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}

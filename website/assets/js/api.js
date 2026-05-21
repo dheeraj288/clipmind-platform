@@ -84,30 +84,28 @@ export async function loginUser(
   email,
   password
 ) {
-
   const response =
     await fetch(
       `${API_BASE_URL}/login`,
       {
-        method: "POST",
+        method:"POST",
 
-        headers: {
+        headers:{
           "Content-Type":
-            "application/json",
+          "application/json"
         },
 
-        body: JSON.stringify({
+        body:JSON.stringify({
           email,
-          password,
-        }),
+          password
+        })
       }
     );
 
   const data =
     await response.json();
 
-  if (!response.ok) {
-
+  if(!response.ok){
     throw new Error(
       data.error ||
       "Login failed"
@@ -116,9 +114,15 @@ export async function loginUser(
 
   setToken(data.token);
 
+  localStorage.setItem(
+    "currentUser",
+    JSON.stringify(
+      data.user
+    )
+  );
+
   return data;
 }
-
 
 export async function signupUser(
   name,
@@ -161,7 +165,12 @@ export async function signupUser(
   }
 
   setToken(data.token);
-
+    localStorage.setItem(
+    "currentUser",
+    JSON.stringify(
+      data.user
+    )
+  );
   return data;
 }
 
@@ -306,3 +315,11 @@ export async function togglePin(id) {
     }
   );
 } 
+
+export function getCurrentUser() {
+  return JSON.parse(
+    localStorage.getItem(
+      "currentUser"
+    )
+  );
+}
