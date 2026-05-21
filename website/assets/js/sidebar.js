@@ -3,14 +3,18 @@ import {
 } from "./api.js";
 
 const sidebar =
-  document.querySelector(
-    ".sidebar"
-  );
+  document.querySelector(".sidebar");
 
 const user =
   getCurrentUser();
 
 if (sidebar && user) {
+  document
+    .querySelectorAll(
+      ".sidebar-profile, .sidebar-profile-wrap, .profile-menu"
+    )
+    .forEach((item) => item.remove());
+
   const profile =
     document.createElement("div");
 
@@ -37,8 +41,15 @@ if (sidebar && user) {
     </div>
   `;
 
-  sidebar.insertBefore(
-    profile,
-    sidebar.querySelector(".logout-btn")
-  );
+  const logoutBtn =
+    sidebar.querySelector(".logout-btn");
+
+  if (logoutBtn) {
+    sidebar.insertBefore(
+      profile,
+      logoutBtn
+    );
+  } else {
+    sidebar.appendChild(profile);
+  }
 }
