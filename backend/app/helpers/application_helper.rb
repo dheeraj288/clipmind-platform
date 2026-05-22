@@ -65,6 +65,14 @@ module ApplicationHelper
     clip.source_url
   end
 
+  def clip_time_group(date)
+    return "Today" if date.to_date == Date.current
+    return "Yesterday" if date.to_date == Date.yesterday
+    return "This Week" if date > 7.days.ago
+
+    date.strftime("%d %b %Y")
+  end
+
   def clip_favicon_url(clip)
     return clip.favicon_url if clip.favicon_url.present?
     return nil if clip.source_url.blank?

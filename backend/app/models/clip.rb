@@ -52,6 +52,29 @@ after_create_commit :broadcast_new_clip
     self.deleted_at = nil
   end
 
+  def related(limit = 5)
+    return Clip.none if tags.blank?
+
+    tag_values =
+      if tags.is_a?(Array)
+        tags
+      elsif tags.is_a?(Hash)
+        tags.values.flatten
+      else
+        []
+      end
+
+    tag_values = tag_values.compact.map(&:to_s).uniq
+
+    return Clip.none if tag_values.blank?
+
+    self.class
+        .where(user_id: user_id)
+        .where.not(id: id)
+        .where("tags ?| array[:tags]", tags: tag_values)
+        .limit(limit)
+  end
+
   private
 
   def broadcast_new_clip

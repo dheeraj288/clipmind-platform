@@ -18,32 +18,32 @@
   </head>
 
   <script>
-  function clipMindHighlightCode() {
-    document.querySelectorAll("[data-clip-code]").forEach(function(block) {
-      if (block.dataset.highlighted === "true") return;
+    function clipMindHighlightCode() {
+      document.querySelectorAll("[data-clip-code]").forEach(function(block) {
+        if (block.dataset.highlighted === "true") return;
 
-      let code = block.textContent.trim();
+        let code = block.textContent.trim();
 
-      code = code
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+        code = code
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
 
-      code = code
-        .replace(/\b(class|module|def|end|do|if|else|elsif|return|true|false|nil|private|public|protected)\b/g, '<span class="clip-token-keyword">$1</span>')
-        .replace(/(:[a-zA-Z_]\w*)/g, '<span class="clip-token-symbol">$1</span>')
-        .replace(/\b([A-Z][A-Za-z0-9_:]*)\b/g, '<span class="clip-token-class">$1</span>')
-        .replace(/\b(\d+)\b/g, '<span class="clip-token-number">$1</span>');
+        code = code
+          .replace(/\b(class|module|def|end|do|if|else|elsif|return|true|false|nil|private|public|protected)\b/g, '<span class="clip-token-keyword">$1</span>')
+          .replace(/(:[a-zA-Z_]\w*)/g, '<span class="clip-token-symbol">$1</span>')
+          .replace(/\b([A-Z][A-Za-z0-9_:]*)\b/g, '<span class="clip-token-class">$1</span>')
+          .replace(/\b(\d+)\b/g, '<span class="clip-token-number">$1</span>');
 
-      block.innerHTML = code;
-      block.dataset.highlighted = "true";
-    });
-  }
+        block.innerHTML = code;
+        block.dataset.highlighted = "true";
+      });
+    }
 
-  document.addEventListener("turbo:load", clipMindHighlightCode);
-  document.addEventListener("turbo:render", clipMindHighlightCode);
-  document.addEventListener("turbo:frame-load", clipMindHighlightCode);
-</script>
+    document.addEventListener("turbo:load", clipMindHighlightCode);
+    document.addEventListener("turbo:render", clipMindHighlightCode);
+    document.addEventListener("turbo:frame-load", clipMindHighlightCode);
+  </script>
 
   <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
     <div class="flex h-screen w-screen overflow-hidden bg-slate-950">
@@ -63,5 +63,10 @@
       data-controller="toast"
       class="fixed right-5 top-5 z-[9999] space-y-3">
     </div>
+    <%= yield %>
+
+  <% if current_user %>
+    <%= render "shared/command_palette" %>
+  <% end %>
   </body>
 </html>

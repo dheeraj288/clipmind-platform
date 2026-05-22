@@ -114,19 +114,28 @@ class ClipsController < ApplicationController
 
   def quick_add
     @clip = current_user.clips.new
+    @collections = current_user.collections.order(:name)
   end
 
   def create
+    detection = ClipDetectorService.detect(clip_params[:content])
+
     @clip = current_user.clips.new(clip_params)
+    @clip.clip_type = detection[:clip_type]
+    @clip.language = detection[:language]
     @clip.source = "manual"
     @clip.copied_at = Time.current
     @clip.copy_count ||= 0
     @clip.is_favorite ||= false
     @clip.is_pinned ||= false
+    @clip.tags = SmartTagService.new(@clip).call
 
     if @clip.save
+      AutoCollectionService.new(user: current_user, clip: @clip).call if @clip.collection_id.blank?
+
       redirect_to clips_path, notice: "Clip added successfully"
     else
+      @collections = current_user.collections.order(:name)
       render :quick_add, status: :unprocessable_entity
     end
   end
@@ -137,8 +146,7 @@ class ClipsController < ApplicationController
     params.require(:clip).permit(
       :title,
       :content,
-      :clip_type,
-      :language
+      :collection_id
     )
   end
 
@@ -150,7 +158,7 @@ class ClipsController < ApplicationController
         render turbo_stream: turbo_stream.replace(
           @clip,
           partial: "shared/clip_card",
-          locals: { clip: @clip }
+          locals: {clip: @clip,collections: @collections}
         )
       end
 

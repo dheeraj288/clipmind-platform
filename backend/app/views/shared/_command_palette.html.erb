@@ -1,0 +1,83 @@
+<div data-controller="command-palette">
+
+  <div
+    data-command-palette-target="panel"
+    class="fixed inset-0 z-[9999] hidden bg-black/70 p-4 backdrop-blur-xl"
+  >
+    <div
+      class="mx-auto mt-24 max-w-2xl overflow-hidden rounded-[28px] border border-white/10 bg-[#080B18] shadow-2xl shadow-fuchsia-950/40"
+    >
+
+      <div class="border-b border-white/10 p-4">
+        <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
+          <span class="text-slate-500">⌕</span>
+
+          <input
+            data-command-palette-target="input"
+            data-action="input->command-palette#search"
+            type="text"
+            placeholder="Search command..."
+            class="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
+          />
+
+          <kbd class="rounded-lg bg-white/10 px-2 py-1 text-[10px] text-slate-400">ESC</kbd>
+        </div>
+      </div>
+
+      <div class="max-h-[430px] space-y-2 overflow-auto p-3">
+
+        <%= link_to quick_add_clips_path,
+            data: { command_palette_target: "item" },
+            class: "flex items-center gap-4 rounded-2xl border border-transparent px-4 py-3 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500/10" do %>
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-fuchsia-500/10 text-lg">＋</span>
+          <div>
+            <p class="text-sm font-semibold text-white">Quick Add Clip</p>
+            <p class="text-xs text-slate-500">Create a new memory clip</p>
+          </div>
+        <% end %>
+
+        <%= link_to clips_path,
+            data: { command_palette_target: "item" },
+            class: "flex items-center gap-4 rounded-2xl border border-transparent px-4 py-3 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500/10" do %>
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-lg">📋</span>
+          <div>
+            <p class="text-sm font-semibold text-white">All Clips</p>
+            <p class="text-xs text-slate-500">Go to your clipboard workspace</p>
+          </div>
+        <% end %>
+
+        <%= link_to favorites_path,
+             data: { command_palette_target: "item" },class: "flex items-center gap-4 rounded-2xl border border-transparent px-4 py-3 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500/10" do %>
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10 text-lg">★</span>
+          <div>
+            <p class="text-sm font-semibold text-white">Favorites</p>
+            <p class="text-xs text-slate-500">Open saved important clips</p>
+          </div>
+        <% end %>
+
+        <%= link_to collections_path,
+            data: { command_palette_target: "item" },
+            class: "flex items-center gap-4 rounded-2xl border border-transparent px-4 py-3 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500/10" do %>
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-lg">🗂️</span>
+          <div>
+            <p class="text-sm font-semibold text-white">Collections</p>
+            <p class="text-xs text-slate-500">Browse grouped clips</p>
+          </div>
+        <% end %>
+
+        <%= link_to ai_search_path,
+            data: { command_palette_target: "item" },
+            class: "flex items-center gap-4 rounded-2xl border border-transparent px-4 py-3 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500/10" do %>
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-lg">⌕</span>
+          <div>
+            <p class="text-sm font-semibold text-white">AI Search</p>
+            <p class="text-xs text-slate-500">Search your clipboard memory</p>
+          </div>
+        <% end %>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

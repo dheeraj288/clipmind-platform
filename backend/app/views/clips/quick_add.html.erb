@@ -6,43 +6,55 @@
     </h1>
 
     <p class="mt-2 text-slate-400">
-      Save text, code or links instantly
+      Paste anything. ClipMind will auto-detect text, code, link, JSON, email or command.
     </p>
   </div>
 
- 	<%= form_with model: @clip, url: clips_path, method: :post, data: { turbo: false } do |f| %>
+  <%= form_with model: @clip, url: clips_path, method: :post, data: { turbo: false } do |f| %>
 
     <div class="space-y-6 rounded-3xl border border-slate-800 bg-slate-900 p-8">
 
+      <% if @clip.errors.any? %>
+        <div class="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+          <%= @clip.errors.full_messages.to_sentence %>
+        </div>
+      <% end %>
+
       <div>
-        <%= f.label :title,
-            class:"mb-2 block text-sm text-slate-300" %>
+        <%= f.label :title, "Title optional",
+            class: "mb-2 block text-sm text-slate-300" %>
 
         <%= f.text_field :title,
-            class:"w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-white" %>
+            placeholder: "Leave blank for smart title",
+            class: "w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-white outline-none focus:border-fuchsia-500" %>
       </div>
 
       <div>
         <%= f.label :content,
-            class:"mb-2 block text-sm text-slate-300" %>
+            class: "mb-2 block text-sm text-slate-300" %>
 
         <%= f.text_area :content,
-            rows:8,
-            class:"w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-white" %>
+            rows: 10,
+            placeholder: "Paste text, code, URL, JSON, email or terminal command...",
+            class: "w-full rounded-xl border border-slate-700 bg-slate-950 p-4 font-mono text-sm text-white outline-none focus:border-fuchsia-500" %>
       </div>
 
       <div>
-        <%= f.label :clip_type,
-            class:"mb-2 block text-sm text-slate-300" %>
+        <%= f.label :collection_id, "Collection optional",
+            class: "mb-2 block text-sm text-slate-300" %>
 
-        <%= f.select :clip_type,
-            ["text","code","link"],
-            {},
-            class:"w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-white" %>
+        <%= f.select :collection_id,
+            options_from_collection_for_select(@collections, :id, :name, @clip.collection_id),
+            { include_blank: "Auto collection" },
+            class: "w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-white outline-none focus:border-fuchsia-500" %>
+      </div>
+
+      <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-sm leading-6 text-indigo-100">
+        Clip type and language will be detected automatically.
       </div>
 
       <%= f.submit "Save Clip",
-          class:"w-full rounded-xl bg-fuchsia-600 py-4 font-semibold text-white hover:bg-fuchsia-500" %>
+          class: "w-full cursor-pointer rounded-xl bg-fuchsia-600 py-4 font-semibold text-white hover:bg-fuchsia-500" %>
 
     </div>
 

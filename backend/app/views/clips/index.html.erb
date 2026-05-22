@@ -141,10 +141,37 @@
 
       <% if @clips.any? %>
 
-        <% @clips.each do |clip| %>
-          <%= render "shared/clip_card", clip: clip %>
-        <% end %>
+        <% @clips.group_by { |c| clip_time_group(c.created_at) }.each do |group, clips| %>
 
+          <div class="mb-10">
+
+          <div class="mb-4 flex items-center gap-3">
+
+          <div class="h-px flex-1 bg-slate-800"></div>
+
+          <div class="rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-fuchsia-100">
+          <%= group %>
+          </div>
+
+          <div class="h-px flex-1 bg-slate-800"></div>
+
+          </div>
+
+          <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+
+          <% clips.each do |clip| %>
+
+          <%= render "shared/clip_card",
+              clip: clip,
+              collections: @collections %>
+
+          <% end %>
+
+          </div>
+
+          </div>
+
+          <% end %>
       <% else %>
 
         <!-- Empty State -->
