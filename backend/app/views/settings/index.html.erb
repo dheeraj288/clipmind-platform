@@ -154,14 +154,26 @@
       <h2 class="text-lg font-bold text-white">Danger Zone</h2>
 
       <div class="mt-5 space-y-3">
-        <button class="w-full rounded-xl bg-slate-800 px-4 py-3 text-left text-sm font-semibold text-slate-200 hover:bg-slate-700">
-          Export all data
-        </button>
+        <div class="grid gap-3 sm:grid-cols-2">
 
-        <button class="w-full rounded-xl bg-slate-800 px-4 py-3 text-left text-sm font-semibold text-slate-200 hover:bg-slate-700">
-          Clear all clips
-        </button>
+        <%= link_to "Export JSON",
+            export_clips_path(format: :json),
+            class: "rounded-xl bg-slate-800 px-4 py-3 text-center text-sm font-semibold text-slate-200 hover:bg-slate-700" %>
 
+        <%= link_to "Export CSV",
+            export_clips_path(format: :csv),
+            class: "rounded-xl bg-slate-800 px-4 py-3 text-center text-sm font-semibold text-slate-200 hover:bg-slate-700" %>
+
+      </div>
+
+        <%= button_to "Clear all clips",
+          clear_all_clips_path,
+          method: :delete,
+          data: {
+            turbo_confirm: "Are you sure? This will clear all your clips."
+          },
+          class: "w-full rounded-xl bg-slate-800 px-4 py-3 text-left text-sm font-semibold text-slate-200 hover:bg-slate-700" %>
+          
         <button class="w-full rounded-xl bg-red-500/10 px-4 py-3 text-left text-sm font-semibold text-red-400 hover:bg-red-500 hover:text-white">
           Delete account
         </button>

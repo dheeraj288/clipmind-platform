@@ -103,6 +103,15 @@ class ClipsController < ApplicationController
     redirect_to clips_path, notice: "Selected clips deleted"
   end
 
+  def clear_all
+    current_user
+      .clips
+      .active
+      .update_all(deleted_at: Time.current, updated_at: Time.current)
+
+    redirect_to clips_path, notice: "All clips cleared successfully"
+  end
+
   private
 
   def refresh_clip_card

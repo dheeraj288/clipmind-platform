@@ -11,4 +11,4 @@ function highlightCode() {
 
 document.addEventListener("turbo:load", highlightCode)
 document.addEventListener("turbo:render", highlightCode)
-document.addEventListener("turbo:frame-load", highlightCode)
+document.addEventListener("turbo:frame-load", highlightCode);
