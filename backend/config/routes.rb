@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       patch :update_collection
       patch :increment_copy
       patch :toggle_pin
+      post :summarize
     end
   end
 

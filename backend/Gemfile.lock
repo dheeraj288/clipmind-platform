@@ -162,6 +162,10 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.3-x86_64-linux-musl)
       racc (~> 1.4)
+    openai (0.64.0)
+      base64
+      cgi
+      connection_pool
     pg (1.6.3)
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-aarch64-linux-musl)
@@ -284,6 +288,7 @@ DEPENDENCIES
   importmap-rails (~> 2.2)
   inline_svg (~> 1.10)
   jwt
+  openai (~> 0.64.0)
   pg (~> 1.1)
   puma (>= 5.0)
   rack-cors

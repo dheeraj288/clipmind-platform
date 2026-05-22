@@ -8,7 +8,7 @@ class AiChatController < ApplicationController
     @message = params[:message]
 
     @response =
-      MemoryChatService.new(
+      MemoryChatV2Service.new(
         user: current_user,
         message: @message
       ).call

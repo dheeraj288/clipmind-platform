@@ -1,0 +1,11 @@
+<%= turbo_stream.update "clip_summary_#{@clip.id}" do %>
+  <div class="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm leading-7 text-emerald-100">
+    <div class="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">
+      AI Summary
+    </div>
+
+    <div class="whitespace-pre-wrap">
+      <%= @summary %>
+    </div>
+  </div>
+<% end %>

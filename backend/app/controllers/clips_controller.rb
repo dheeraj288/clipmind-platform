@@ -192,6 +192,16 @@ class ClipsController < ApplicationController
     end
   end
 
+  def summarize
+    @clip = current_user.clips.find(params[:id])
+    @summary = ClipSummaryService.new(@clip).call
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_back fallback_location: clips_path, notice: "Summary generated." }
+    end
+  end
+
   private
 
   def clip_params
