@@ -1,5 +1,6 @@
 class Clip < ApplicationRecord
 before_create :set_defaults
+after_create_commit :broadcast_new_clip
   
 
   belongs_to :user
@@ -51,6 +52,19 @@ before_create :set_defaults
     self.deleted_at = nil
   end
 
+  private
+
+  def broadcast_new_clip
+    broadcast_prepend_to(
+      "user_#{user_id}_clips",
+      target: "clips_list_items",
+      partial: "shared/clip_card",
+      locals: {
+        clip: self,
+        collections: user.collections.order(:name)
+      }
+    )
+  end
 end
 
 

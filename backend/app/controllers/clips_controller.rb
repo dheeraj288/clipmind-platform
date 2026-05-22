@@ -63,6 +63,46 @@ class ClipsController < ApplicationController
     end
   end
 
+  def toggle_pin
+    @clip = current_user.clips.find(params[:id])
+    @clip.update!(is_pinned: !@clip.is_pinned?)
+
+    refresh_clip_card
+  end
+
+  def bulk_favorite
+    clip_ids = params[:clip_ids].to_s.split(",")
+
+    current_user
+      .clips
+      .where(id: clip_ids)
+      .update_all(is_favorite: true, updated_at: Time.current)
+
+    redirect_to clips_path, notice: "Selected clips added to favorites"
+  end
+
+  def bulk_pin
+    clip_ids = params[:clip_ids].to_s.split(",")
+
+    current_user
+      .clips
+      .where(id: clip_ids)
+      .update_all(is_pinned: true, updated_at: Time.current)
+
+    redirect_to clips_path, notice: "Selected clips pinned"
+  end
+
+  def bulk_delete
+    clip_ids = params[:clip_ids].to_s.split(",")
+
+    current_user
+      .clips
+      .where(id: clip_ids)
+      .update_all(deleted_at: Time.current, updated_at: Time.current)
+
+    redirect_to clips_path, notice: "Selected clips deleted"
+  end
+
   private
 
   def refresh_clip_card

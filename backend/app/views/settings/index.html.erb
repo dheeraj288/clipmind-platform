@@ -1,0 +1,171 @@
+<div class="space-y-8">
+  <section>
+    <h1 class="text-2xl font-bold text-white">Settings</h1>
+
+    <p class="mt-2 text-sm text-slate-400">
+      Manage your ClipMind preferences.
+    </p>
+  </section>
+
+  <section class="grid gap-5 xl:grid-cols-2">
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <h2 class="text-lg font-bold text-white">Notifications</h2>
+      <p class="mt-1 text-sm text-slate-400">Manage notification preferences.</p>
+
+      <div class="mt-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Desktop notifications</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Email digest</span>
+          <span class="h-6 w-11 rounded-full bg-slate-700 p-1"><span class="block h-4 w-4 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">AI suggestions</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <h2 class="text-lg font-bold text-white">Appearance</h2>
+      <p class="mt-1 text-sm text-slate-400">Customize the look and feel.</p>
+
+      <div class="mt-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Dark mode</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Compact view</span>
+          <span class="h-6 w-11 rounded-full bg-slate-700 p-1"><span class="block h-4 w-4 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Show animations</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <h2 class="text-lg font-bold text-white">Clipboard</h2>
+      <p class="mt-1 text-sm text-slate-400">Configure clipboard behavior.</p>
+
+      <div class="mt-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Auto-save clipboard</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Sync across devices</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Smart categorization</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <h2 class="text-lg font-bold text-white">Account</h2>
+      <p class="mt-1 text-sm text-slate-400">Signed in as:</p>
+
+      <div class="mt-5 rounded-xl border border-slate-800 bg-slate-950 p-4">
+        <p class="font-semibold text-white"><%= current_user.name.presence || "ClipMind User" %></p>
+        <p class="mt-1 text-sm text-slate-500"><%= current_user.email %></p>
+      </div>
+    </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <h2 class="text-lg font-bold text-white">Keyboard Shortcuts</h2>
+      <p class="mt-1 text-sm text-slate-400">Customize keyboard shortcuts.</p>
+
+      <div class="mt-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Quick search (⌘K)</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Save clipboard (⌘S)</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Quick paste (⌘⇧V)</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <h2 class="text-lg font-bold text-white">Privacy & Security</h2>
+      <p class="mt-1 text-sm text-slate-400">Manage your data and privacy.</p>
+
+      <div class="mt-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">End-to-end encryption</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Auto-delete after 30 days</span>
+          <span class="h-6 w-11 rounded-full bg-slate-700 p-1"><span class="block h-4 w-4 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Require password</span>
+          <span class="h-6 w-11 rounded-full bg-slate-700 p-1"><span class="block h-4 w-4 rounded-full bg-white"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <h2 class="text-lg font-bold text-white">Storage</h2>
+      <p class="mt-1 text-sm text-slate-400">Manage storage and backups.</p>
+
+      <div class="mt-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Cloud backup</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Local backup</span>
+          <span class="h-6 w-11 rounded-full bg-slate-700 p-1"><span class="block h-4 w-4 rounded-full bg-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-300">Auto-cleanup old clips</span>
+          <span class="h-6 w-11 rounded-full bg-fuchsia-600 p-1"><span class="block h-4 w-4 translate-x-5 rounded-full bg-white"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-red-500/20 bg-slate-900 p-6 xl:col-span-2">
+      <h2 class="text-lg font-bold text-white">Danger Zone</h2>
+
+      <div class="mt-5 space-y-3">
+        <button class="w-full rounded-xl bg-slate-800 px-4 py-3 text-left text-sm font-semibold text-slate-200 hover:bg-slate-700">
+          Export all data
+        </button>
+
+        <button class="w-full rounded-xl bg-slate-800 px-4 py-3 text-left text-sm font-semibold text-slate-200 hover:bg-slate-700">
+          Clear all clips
+        </button>
+
+        <button class="w-full rounded-xl bg-red-500/10 px-4 py-3 text-left text-sm font-semibold text-red-400 hover:bg-red-500 hover:text-white">
+          Delete account
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

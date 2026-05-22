@@ -1,0 +1,42 @@
+<div class="mx-auto max-w-3xl space-y-8">
+  <section>
+    <h1 class="text-2xl font-bold text-white">Quick Add</h1>
+    <p class="mt-2 text-sm text-slate-400">
+      Manually save text, code, links, commands or notes to ClipMind.
+    </p>
+  </section>
+
+  <section class="rounded-3xl border border-slate-800 bg-slate-900 p-6">
+    <div class="grid gap-5">
+      <input
+        type="text"
+        placeholder="Title..."
+        class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-fuchsia-500"
+      >
+
+      <select class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-fuchsia-500">
+        <option>Text</option>
+        <option>Code</option>
+        <option>Link</option>
+        <option>Command</option>
+        <option>JSON</option>
+      </select>
+
+      <textarea
+        rows="10"
+        placeholder="Paste or type your clip content..."
+        class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-slate-500 focus:border-fuchsia-500"
+      ></textarea>
+
+      <div class="flex justify-end gap-3">
+        <%= link_to "Cancel",
+            clips_path,
+            class: "rounded-xl border border-slate-700 px-5 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-800" %>
+
+        <button class="rounded-xl bg-fuchsia-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-600/30 hover:bg-fuchsia-500">
+          Save Clip
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

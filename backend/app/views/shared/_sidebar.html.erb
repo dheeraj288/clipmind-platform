@@ -30,8 +30,8 @@
       <span>Collections</span>
     <% end %>
 
-    <%= link_to "#",
-        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-900 hover:text-white" do %>
+    <%= link_to prompts_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'prompts' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
       <%= render "shared/sidebar_icon", name: "prompts" %>
       <span>Prompts</span>
     <% end %>
@@ -56,14 +56,14 @@
   </nav>
 
   <div class="space-y-2 border-t border-slate-800 px-4 py-5">
-    <%= link_to "#",
-        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-900 hover:text-white" do %>
+    <%= link_to settings_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'settings' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
       <%= render "shared/sidebar_icon", name: "settings" %>
       <span>Settings</span>
     <% end %>
 
-    <%= link_to "#",
-        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-slate-900 hover:text-white" do %>
+    <%= link_to profile_path,
+        class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'profile' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
       <%= render "shared/sidebar_icon", name: "profile" %>
       <span>Profile</span>
     <% end %>

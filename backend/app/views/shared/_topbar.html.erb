@@ -18,9 +18,9 @@
         <span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-fuchsia-500"></span>
       </button>
 
-      <button class="rounded-xl bg-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-fuchsia-600/30 hover:bg-fuchsia-500">
-        + Quick Add
-      </button>
+      <%= link_to "+ Quick Add",
+          quick_add_path,
+          class: "rounded-xl bg-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-fuchsia-600/30 hover:bg-fuchsia-500" %>
 
       <%= button_to "Logout",
           logout_path,
