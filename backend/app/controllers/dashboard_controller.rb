@@ -37,5 +37,6 @@ class DashboardController < ApplicationController
           &.limit(6) || []
 
     @recent_memory = @recent_clips
+    @insights = MemoryInsightsService.new(current_user).call
   end
 end

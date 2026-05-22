@@ -37,6 +37,9 @@ Rails.application.routes.draw do
   get "ai_search", to: "ai_search#index", as: :ai_search
   get "ai_memory", to: "ai_memory#index", as: :ai_memory
 
+  get "/ai_chat", to: "ai_chat#index"
+  post "/ai_chat", to: "ai_chat#create"
+
   resources :collections, only: [:index, :show, :create]
   
   get "favorites", to: "favorites#index"
