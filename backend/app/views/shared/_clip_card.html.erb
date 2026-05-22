@@ -191,11 +191,11 @@
 
         <div class="flex flex-wrap gap-2">
           <% clip.related.each do |related| %>
-            <%= link_to(
-                related.title.presence || truncate(related.content, length: 28),
-                clips_path(anchor: dom_id(related)),
-                class: "rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] text-slate-300 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500/10 hover:text-white"
-            ) %>
+               <%= link_to(
+                    clean_clip_title(related),
+                    clips_path(anchor: dom_id(related)),
+                    class: "rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] text-slate-300 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500/10 hover:text-white"
+                ) %>
           <% end %>
         </div>
       </div>

@@ -1,16 +1,13 @@
 {
   "manifest_version": 3,
-
-  "name": "Clipboard Pro",
-
-  "version": "4.0.0",
-
-  "description": "Modern clipboard manager",
+  "name": "ClipMind",
+  "version": "4.1.0",
+  "description": "AI clipboard memory workspace",
 
   "permissions": [
-  "storage",
-  "tabs",
-  "scripting"
+    "storage",
+    "tabs",
+    "scripting"
   ],
 
   "host_permissions": [
@@ -29,8 +26,9 @@
 
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ]
 }

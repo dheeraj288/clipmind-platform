@@ -1,368 +1,151 @@
-console.log("Background Running");
+console.log("ClipMind background running")
 
-/* API CONFIG */
-const API_BASE_URL =
-  "http://localhost:3000/api/v1";
+const API_BASE_URL = "http://localhost:3000/api/v1"
 
-/* DUPLICATE STORE */
-const recentClips = new Map();
+const recentClips = new Map()
+const DUPLICATE_WINDOW = 3000
 
-/* GET AUTH TOKEN */
 async function getToken() {
-  const result =
-    await chrome.storage.local.get(
-      "token"
-    );
-
-  return result.token;
+  const result = await chrome.storage.local.get("token")
+  return result.token
 }
 
-/* DUPLICATE CHECK */
+function cleanText(text) {
+  return (text || "").replace(/\s+/g, " ").trim()
+}
+
 function isDuplicate(text) {
-  const now = Date.now();
+  const key = cleanText(text).slice(0, 500)
+  const now = Date.now()
 
-  if (recentClips.has(text)) {
-    const lastTime =
-      recentClips.get(text);
+  if (recentClips.has(key)) {
+    const lastTime = recentClips.get(key)
 
-    if (now - lastTime < 2000) {
-      return true;
+    if (now - lastTime < DUPLICATE_WINDOW) {
+      return true
     }
   }
 
-  recentClips.set(text, now);
+  recentClips.set(key, now)
 
-  return false;
+  setTimeout(() => {
+    recentClips.delete(key)
+  }, DUPLICATE_WINDOW)
+
+  return false
 }
 
-/* NORMALIZE CLIP MESSAGE */
-function normalizeClipMessage(message) {
-  const text =
-    message.content?.trim() || "";
+function buildClipPayload(message) {
+  const content = (message.content || "").trim()
 
   return {
-    text,
-
-    title:
-      text.substring(0, 30),
-
-    source_url:
-      message.source_url || null,
-
-    page_title:
-      message.page_title || null,
-
-    site_name:
-      message.site_name || null,
-
-    favicon_url:
-      message.favicon_url || null,
-
-    preview_image:
-      message.preview_image || null,
-
-    page_description:
-      message.page_description || null,
-
-    content_kind:
-      message.content_kind || "page",
-
-    surrounding_text:
-      message.surrounding_text || null,
-  };
-}
-
-/* SYNC TO RAILS */
-async function syncClipToServer(message) {
-  try {
-    const token =
-      await getToken();
-
-    if (!token) {
-      console.log(
-        "No authenticated user"
-      );
-
-      return;
-    }
-
-    const clipData =
-      normalizeClipMessage(message);
-
-    if (!clipData.text) return;
-
-    const response =
-      await fetch(
-        `${API_BASE_URL}/clips`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-
-            Authorization:
-              `Bearer ${token}`,
-          },
-
-          body: JSON.stringify({
-            clip: {
-              title:
-                clipData.title,
-
-              content:
-                clipData.text,
-
-              source:
-                "chrome-extension",
-
-              copied_at:
-                new Date().toISOString(),
-
-              is_favorite:
-                false,
-
-              source_url:
-                clipData.source_url,
-
-              page_title:
-                clipData.page_title,
-
-              site_name:
-                clipData.site_name,
-
-              favicon_url:
-                clipData.favicon_url,
-
-              preview_image:
-                clipData.preview_image,
-
-              page_description:
-                clipData.page_description,
-
-              content_kind:
-                clipData.content_kind,
-
-              surrounding_text:
-                clipData.surrounding_text,
-            },
-          }),
-        }
-      );
-
-    if (response.status === 401) {
-      console.error(
-        "Unauthorized user"
-      );
-
-      await chrome.storage.local.remove([
-        "token",
-        "currentUser",
-      ]);
-
-      return;
-    }
-
-    const data =
-      await response.json();
-
-    if (!response.ok) {
-      console.error(
-        "SYNC FAILED:",
-        data
-      );
-
-      return;
-    }
-
-    console.log(
-      "SYNCED:",
-      data
-    );
-
-  } catch (error) {
-    console.error(
-      "SYNC ERROR:",
-      error
-    );
+    title: content.slice(0, 80),
+    content,
+    source: "chrome-extension",
+    copied_at: new Date().toISOString(),
+    is_favorite: false,
+    source_url: message.source_url || null,
+    page_title: message.page_title || null,
+    site_name: message.site_name || null,
+    favicon_url: message.favicon_url || null,
+    preview_image: message.preview_image || null,
+    page_description: message.page_description || null,
+    content_kind: message.content_kind || "selection",
+    surrounding_text: message.surrounding_text || null
   }
 }
 
-/* LOCAL STORAGE SAVE */
 async function saveClipLocally(message) {
-  const clipData =
-    normalizeClipMessage(message);
+  const clip = buildClipPayload(message)
 
-  const res =
-    await chrome.storage.local.get(
-      ["clips"]
-    );
+  if (!clip.content) return
 
-  let clips =
-    res.clips || [];
+  const result = await chrome.storage.local.get(["clips"])
+  let clips = result.clips || []
 
-  clips =
-    clips.filter(
-      (item) =>
-        item.text !== clipData.text
-    );
+  clips = clips.filter((item) => item.content !== clip.content)
 
   clips.unshift({
     id: Date.now(),
+    ...clip,
+    created_at: new Date().toISOString()
+  })
 
-    text:
-      clipData.text,
+  clips = clips.slice(0, 300)
 
-    time:
-      new Date()
-        .toLocaleString(),
-
-    pinned:
-      false,
-
-    source_url:
-      clipData.source_url,
-
-    page_title:
-      clipData.page_title,
-
-    site_name:
-      clipData.site_name,
-
-    favicon_url:
-      clipData.favicon_url,
-
-    preview_image:
-      clipData.preview_image,
-
-    page_description:
-      clipData.page_description,
-
-    content_kind:
-      clipData.content_kind,
-
-    surrounding_text:
-      clipData.surrounding_text,
-  });
-
-  clips =
-    clips.slice(0, 300);
-
-  await chrome.storage.local.set({
-    clips,
-  });
+  await chrome.storage.local.set({ clips })
 }
 
-/* INJECT CONTENT SCRIPT */
-async function injectContentScript() {
-  const tabs =
-    await chrome.tabs.query({});
+async function syncClipToServer(message) {
+  const token = await getToken()
 
-  for (const tab of tabs) {
-    if (
-      tab.url &&
-      (
-        tab.url.startsWith("http://") ||
-        tab.url.startsWith("https://")
-      )
-    ) {
-      try {
-        await chrome.scripting
-          .executeScript({
-            target: {
-              tabId: tab.id,
-            },
-
-            files: [
-              "content.js",
-            ],
-          });
-
-        console.log(
-          "Injected:",
-          tab.id
-        );
-
-      } catch (error) {
-        /* ignore restricted pages */
-      }
-    }
+  if (!token) {
+    console.warn("ClipMind: user not logged in")
+    return
   }
+
+  const clip = buildClipPayload(message)
+
+  if (!clip.content) return
+
+  const response = await fetch(`${API_BASE_URL}/clips`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ clip })
+  })
+
+  const data = await response.json().catch(() => ({}))
+
+  if (response.status === 401) {
+    await chrome.storage.local.remove(["token", "currentUser"])
+    console.error("ClipMind: unauthorized, login again")
+    return
+  }
+
+  if (!response.ok) {
+    console.error("ClipMind sync failed", data)
+    return
+  }
+
+  console.log("ClipMind synced", data)
 }
 
-injectContentScript();
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type !== "SAVE_CLIP") return
 
-/* MESSAGE HANDLER */
-chrome.runtime.onMessage
-  .addListener(
-    (
-      message,
-      sender,
-      sendResponse
-    ) => {
+  const text = (message.content || "").trim()
 
-      if (
-        message.type !==
-        "SAVE_CLIP"
-      ) {
-        return;
-      }
+  if (!text) {
+    sendResponse({ success: false, error: "empty_content" })
+    return
+  }
 
-      const text =
-        message.content?.trim();
+  if (isDuplicate(text)) {
+    sendResponse({ success: false, duplicate: true })
+    return
+  }
 
-      if (!text) {
-        sendResponse({
-          success: false,
-          error: "empty_content",
-        });
+  ;(async () => {
+    try {
+      await saveClipLocally(message)
+      await syncClipToServer(message)
 
-        return;
-      }
+      chrome.runtime.sendMessage({
+        type: "CLIP_UPDATED"
+      })
 
-      if (isDuplicate(text)) {
-        sendResponse({
-          success: false,
-          duplicate: true,
-        });
-
-        return;
-      }
-
-      (async () => {
-        try {
-          await saveClipLocally(
-            message
-          );
-
-          await syncClipToServer(
-            message
-          );
-
-          chrome.runtime
-            .sendMessage({
-              type:
-                "CLIP_UPDATED",
-            });
-
-          sendResponse({
-            success: true,
-          });
-
-        } catch (error) {
-          console.error(
-            "SAVE_CLIP ERROR:",
-            error
-          );
-
-          sendResponse({
-            success: false,
-            error:
-              error.message,
-          });
-        }
-      })();
-
-      return true;
+      sendResponse({ success: true })
+    } catch (error) {
+      console.error("ClipMind save error", error)
+      sendResponse({
+        success: false,
+        error: error.message
+      })
     }
-  );
+  })()
+
+  return true
+})

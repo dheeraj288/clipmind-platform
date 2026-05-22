@@ -72,24 +72,15 @@ class Api::V1::ClipsController < Api::V1::BaseController
     )
 
     if clip.save
-      AutoCollectionService
-        .new(
-          user: current_user,
-          clip: clip
-        )
-        .call
+      AutoCollectionService.new(user: current_user, clip: clip).call if clip.collection_id.blank?
 
-      clip.reload
-
-      clip.update!(
-        tags: SmartTagService
-                .new(clip)
-                .call
-      )
-
-      render json: clip, status: :created
+      render json: {
+        status: "success",
+        clip: clip
+      }, status: :created
     else
       render json: {
+        status: "error",
         errors: clip.errors.full_messages
       }, status: :unprocessable_entity
     end

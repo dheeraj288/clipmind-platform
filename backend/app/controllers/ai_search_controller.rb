@@ -1,22 +1,13 @@
 class AiSearchController < ApplicationController
-  skip_before_action :authenticate_request!
-
   def index
-    user = current_user
-
     @query = params[:q].to_s.strip
-    @results = Clip.none
+    @collections = current_user.collections.order(:name)
 
-    return if @query.blank?
+    @results = SmartSearchService.new(
+      user: current_user,
+      query: @query
+    ).call
 
-    @results =
-      user
-        .clips
-        .active
-        .where(
-          "title ILIKE :query OR content ILIKE :query OR clip_type ILIKE :query",
-          query: "%#{@query}%"
-        )
-        .order(copy_count: :desc, created_at: :desc)
+    @clips = @results
   end
 end

@@ -1,30 +1,23 @@
 class AiMemoryController < ApplicationController
-  skip_before_action :authenticate_request!
-
   def index
-    user = current_user
+    @timeline =
+      current_user
+        .clips
+        .active
+        .order(created_at: :desc)
+        .group_by do |clip|
 
-    @memory_clips =
-      user
-        &.clips
-        &.active
-        &.where("copy_count > 0")
-        &.order(copy_count: :desc, updated_at: :desc)
-        &.limit(8) || Clip.none
+          date = clip.created_at.to_date
 
-    @favorite_memory =
-      user
-        &.clips
-        &.active
-        &.where(is_favorite: true)
-        &.order(updated_at: :desc)
-        &.limit(4) || Clip.none
+          if date == Date.current
+            "Today"
 
-    @recent_memory =
-      user
-        &.clips
-        &.active
-        &.order(created_at: :desc)
-        &.limit(4) || Clip.none
+          elsif date == Date.yesterday
+            "Yesterday"
+
+          else
+            date.strftime("%d %b %Y")
+          end
+        end
   end
 end
