@@ -34,7 +34,7 @@
     </div>
   <% end %>
 
-  <%= turbo_frame_tag "clips_list" do %>
+  <%= turbo_frame_tag "clips_list",data: {controller: "auto-refresh",auto_refresh_interval_value: 3000} do %>
     <div class="grid gap-4">
       <% if @clips.any? %>
         <% @clips.each do |clip| %>

@@ -1,8 +1,8 @@
 class FavoritesController < ApplicationController
-  skip_before_action :authenticate_user!
+  skip_before_action :authenticate_request!
 
   def index
-    user = User.first
+    user = current_user
 
     @collections = user&.collections&.order(:name) || Collection.none
 

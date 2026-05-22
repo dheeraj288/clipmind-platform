@@ -1,10 +1,14 @@
 Rails.application.routes.draw do
-  get 'ai_memory/index'
-  get 'favorites/index'
-  get 'collections/index'
-  get 'collections/show'
-  get 'clips/index'
+  get 'registrations/new'
+  get 'sessions/new'
   root "home#index"
+  
+  get    "login",  to: "auth/sessions#new",     as: :login
+  post   "login",  to: "auth/sessions#create"
+  delete "logout", to: "auth/sessions#destroy", as: :logout
+
+  get  "signup", to: "auth/registrations#new",    as: :signup
+  post "signup", to: "auth/registrations#create"
 
   get "dashboard", to: "dashboard#index", as: :dashboard
   resources :clips, only: [:index, :destroy] do
@@ -14,6 +18,8 @@ Rails.application.routes.draw do
       patch :increment_copy
     end
   end
+
+
 
   get "ai_search", to: "ai_search#index", as: :ai_search
   get "ai_memory", to: "ai_memory#index", as: :ai_memory

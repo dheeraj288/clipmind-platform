@@ -1,8 +1,8 @@
 class AiMemoryController < ApplicationController
-  skip_before_action :authenticate_user!
+  skip_before_action :authenticate_request!
 
   def index
-    user = User.first
+    user = current_user
 
     @memory_clips =
       user

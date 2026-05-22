@@ -10,7 +10,7 @@ module ApplicationHelper
     ]
   end
 
- def collection_icons
-  ["train", "bot", "plug", "laptop", "palette", "database"]
-end
+  def collection_icons
+    ["🚂", "🤖", "🔌", "💻", "🎨", "▣"]
+  end
 end

@@ -1,5 +1,5 @@
 class Api::V1::AuthController < Api::V1::BaseController
-  skip_before_action :authenticate_user!, only: [:signup, :login]
+  skip_before_action :authenticate_request!, only: [:signup, :login]
 
   def signup
     user = User.new(user_params)

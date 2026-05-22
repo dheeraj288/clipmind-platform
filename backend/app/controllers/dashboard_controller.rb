@@ -1,8 +1,8 @@
 class DashboardController < ApplicationController
-  skip_before_action :authenticate_user!
+  skip_before_action :authenticate_request!
 
   def index
-    user = User.first
+    user = current_user
 
     @total_clips = user&.clips&.active&.count || 0
     @favorite_clips = user&.clips&.active&.where(is_favorite: true)&.count || 0

@@ -1,8 +1,8 @@
 class AiSearchController < ApplicationController
-  skip_before_action :authenticate_user!
+  skip_before_action :authenticate_request!
 
   def index
-    user = User.first
+    user = current_user
 
     @query = params[:q].to_s.strip
     @results = Clip.none
