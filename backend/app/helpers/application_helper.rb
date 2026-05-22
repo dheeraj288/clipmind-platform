@@ -14,15 +14,47 @@ module ApplicationHelper
     ["🚂", "🤖", "🔌", "💻", "🎨", "▣"]
   end
 
-  def clean_clip_title(clip)
-    title = clip.title.presence || clip.page_title.presence || clip.content.to_s.lines.first
+ def clean_clip_title(clip)
+    content = clip.content.to_s.strip
 
-    title = title.to_s.strip
-    title = title.gsub(/\s+/, " ")
-    title = title.gsub(/class\s+/, "Class: ")
-    title = title.gsub(/def\s+/, "Method: ")
+    return clip.page_title if clip.page_title.present?
 
-    title.truncate(70)
+    case clip.clip_type
+
+    when "code"
+
+      # Ruby class
+      if content.match(/class\s+([A-Z]\w+)/)
+        return "#{$1} Class"
+      end
+
+      # Ruby module
+      if content.match(/module\s+([A-Z]\w+)/)
+        return "#{$1} Module"
+      end
+
+      # Methods/functions
+      if content.match(/def\s+([a-z_]\w*)/)
+        return "#{$1} Method"
+      end
+
+      "Code Snippet"
+
+    when "link"
+      URI.parse(clip.source_url).host.gsub("www.","") rescue "Website"
+
+    when "json"
+      "JSON Data"
+
+    when "command"
+      "Command Snippet"
+
+    when "email"
+      "Email Content"
+
+    else
+      content.split(".").first.truncate(50)
+    end
   end
 
   def clip_domain(clip)

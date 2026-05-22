@@ -8,16 +8,42 @@
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-
     <%= javascript_importmap_tags %>
-</head>
+    <style>
+      .clip-token-keyword { color: #c084fc; font-weight: 700; }
+      .clip-token-symbol { color: #f472b6; }
+      .clip-token-class { color: #facc15; }
+      .clip-token-number { color: #f59e0b; }
+    </style>
+  </head>
+
+  <script>
+  function clipMindHighlightCode() {
+    document.querySelectorAll("[data-clip-code]").forEach(function(block) {
+      if (block.dataset.highlighted === "true") return;
+
+      let code = block.textContent.trim();
+
+      code = code
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      code = code
+        .replace(/\b(class|module|def|end|do|if|else|elsif|return|true|false|nil|private|public|protected)\b/g, '<span class="clip-token-keyword">$1</span>')
+        .replace(/(:[a-zA-Z_]\w*)/g, '<span class="clip-token-symbol">$1</span>')
+        .replace(/\b([A-Z][A-Za-z0-9_:]*)\b/g, '<span class="clip-token-class">$1</span>')
+        .replace(/\b(\d+)\b/g, '<span class="clip-token-number">$1</span>');
+
+      block.innerHTML = code;
+      block.dataset.highlighted = "true";
+    });
+  }
+
+  document.addEventListener("turbo:load", clipMindHighlightCode);
+  document.addEventListener("turbo:render", clipMindHighlightCode);
+  document.addEventListener("turbo:frame-load", clipMindHighlightCode);
+</script>
 
   <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
     <div class="flex h-screen w-screen overflow-hidden bg-slate-950">

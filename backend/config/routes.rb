@@ -19,18 +19,19 @@ Rails.application.routes.draw do
 
   delete "clips/clear_all", to: "clips#clear_all", as: :clear_all_clips
 
-  resources :clips, only: [:index, :destroy] do
+  resources :clips, only: [:index, :create, :destroy] do
+    collection do
+      get :quick_add
+      patch :bulk_favorite
+      patch :bulk_pin
+      delete :bulk_delete
+    end
+
     member do
       patch :toggle_favorite
       patch :update_collection
       patch :increment_copy
       patch :toggle_pin
-    end
-
-    collection do
-      patch :bulk_favorite
-      patch :bulk_pin
-      delete :bulk_delete
     end
   end
 

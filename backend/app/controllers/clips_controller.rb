@@ -112,7 +112,35 @@ class ClipsController < ApplicationController
     redirect_to clips_path, notice: "All clips cleared successfully"
   end
 
+  def quick_add
+    @clip = current_user.clips.new
+  end
+
+  def create
+    @clip = current_user.clips.new(clip_params)
+    @clip.source = "manual"
+    @clip.copied_at = Time.current
+    @clip.copy_count ||= 0
+    @clip.is_favorite ||= false
+    @clip.is_pinned ||= false
+
+    if @clip.save
+      redirect_to clips_path, notice: "Clip added successfully"
+    else
+      render :quick_add, status: :unprocessable_entity
+    end
+  end
+
   private
+
+  def clip_params
+    params.require(:clip).permit(
+      :title,
+      :content,
+      :clip_type,
+      :language
+    )
+  end
 
   def refresh_clip_card
     @collections = current_user.collections.order(:name)
