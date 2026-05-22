@@ -1,11 +1,4 @@
 Rails.application.routes.draw do
-  get 'exports/download'
-  get 'quick_adds/new'
-  get 'prompts/index'
-  get 'profile/show'
-  get 'settings/index'
-  get 'registrations/new'
-  get 'sessions/new'
   root "home#index"
   
   get    "login",  to: "auth/sessions#new",     as: :login
@@ -22,6 +15,7 @@ Rails.application.routes.draw do
   resources :clips, only: [:index, :create, :destroy] do
     collection do
       get :quick_add
+      post :quick_create
       patch :bulk_favorite
       patch :bulk_pin
       delete :bulk_delete

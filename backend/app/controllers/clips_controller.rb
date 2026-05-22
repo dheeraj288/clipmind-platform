@@ -140,6 +140,31 @@ class ClipsController < ApplicationController
     end
   end
 
+  def quick_create
+    detection = ClipDetectorService.detect(params[:content])
+
+    clip = current_user.clips.new(
+      content: params[:content],
+      title: params[:title],
+      clip_type: detection[:clip_type],
+      language: detection[:language],
+      source: "command_palette",
+      copied_at: Time.current,
+      copy_count: 0,
+      is_favorite: false,
+      is_pinned: false
+    )
+
+    clip.tags = SmartTagService.new(clip).call
+
+    if clip.save
+      AutoCollectionService.new(user: current_user, clip: clip).call if clip.collection_id.blank?
+      redirect_to clips_path, notice: "Clip added"
+    else
+      redirect_to clips_path, alert: "Clip could not be added"
+    end
+  end
+
   private
 
   def clip_params
