@@ -1,0 +1,37 @@
+<div class="group rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-fuchsia-500/30 hover:bg-white/[0.06]">
+  <div class="mb-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2">
+      <span class="rounded-full bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-200">
+        <%= clip.clip_type %>
+      </span>
+
+      <% if clip.language.present? %>
+        <span class="rounded-full bg-fuchsia-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-fuchsia-200">
+          <%= clip.language %>
+        </span>
+      <% end %>
+    </div>
+
+    <span class="text-[11px] text-slate-500">
+      <%= time_ago_in_words(clip.created_at) %> ago
+    </span>
+  </div>
+
+  <h3 class="line-clamp-1 text-sm font-bold text-white">
+    <%= clean_clip_title(clip) %>
+  </h3>
+
+  <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-400">
+    <%= clip.content %>
+  </p>
+
+  <div class="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
+    <span class="text-xs text-slate-500">
+      ⚡ <%= clip.copy_count || 0 %> copies
+    </span>
+
+    <%= link_to "Open",
+        clips_path(anchor: dom_id(clip)),
+        class: "text-xs font-bold text-fuchsia-400 hover:text-fuchsia-300" %>
+  </div>
+</div>

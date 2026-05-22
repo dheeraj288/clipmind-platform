@@ -18,6 +18,33 @@ class ClipsController < ApplicationController
     end
 
     @clips = @clips.order(is_pinned: :desc, created_at: :desc)
+
+    @today_clips = current_user.clips.active.where(
+      created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day
+    )
+
+    @memory_stats = {
+      total: @today_clips.count,
+      code: @today_clips.where(clip_type: "code").count,
+      links: @today_clips.where(clip_type: "link").count,
+      commands: @today_clips.where(clip_type: "command").count
+    }
+
+    @top_tags =
+      current_user.clips.active
+                  .where.not(tags: nil)
+                  .pluck(:tags)
+                  .flatten
+                  .compact
+                  .group_by(&:itself)
+                  .transform_values(&:count)
+                  .sort_by { |_, count| -count }
+                  .first(5)
+
+    @recent_memory =
+      current_user.clips.active
+                  .order(created_at: :desc)
+                  .limit(5)
   end
 
   def toggle_favorite

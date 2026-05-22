@@ -1,4 +1,5 @@
-<aside class="hidden w-64 shrink-0 border-r border-slate-800 bg-slate-950 lg:flex lg:flex-col">
+<aside class="fixed left-0 top-0 z-40 hidden h-screen w-64 shrink-0 border-r border-slate-800 bg-slate-950 lg:flex lg:flex-col">
+  <!-- Logo -->
   <div class="flex h-16 items-center justify-between border-b border-slate-800 px-5">
     <%= link_to dashboard_path, class: "flex items-center gap-3" do %>
       <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-600 to-cyan-400 text-white shadow-lg shadow-fuchsia-600/30">
@@ -11,8 +12,9 @@
     <button class="text-slate-500 hover:text-white">‹</button>
   </div>
 
+  <!-- Main nav -->
   <nav class="flex-1 space-y-2 px-4 py-5">
-    <%= link_to dashboard_path,
+      <%= link_to dashboard_path,
         class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{current_page?(dashboard_path) ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
       <%= render "shared/sidebar_icon", name: "dashboard" %>
       <span>Dashboard</span>
@@ -38,8 +40,8 @@
 
     <%= link_to favorites_path,
         class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'favorites' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
-        <%= render "shared/sidebar_icon", name: "favorites" %>
-        <span>Favorites</span>
+      <%= render "shared/sidebar_icon", name: "favorites" %>
+      <span>Favorites</span>
     <% end %>
 
     <%= link_to ai_search_path,
@@ -55,7 +57,8 @@
     <% end %>
   </nav>
 
-  <div class="space-y-2 border-t border-slate-800 px-4 py-5">
+  <!-- Bottom -->
+  <div class="mt-auto space-y-2 border-t border-slate-800 px-4 py-5">
     <%= link_to settings_path,
         class: "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold #{controller_name == 'settings' ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/30' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}" do %>
       <%= render "shared/sidebar_icon", name: "settings" %>
@@ -68,4 +71,5 @@
       <span>Profile</span>
     <% end %>
   </div>
+
 </aside>
