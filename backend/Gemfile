@@ -68,3 +68,9 @@ gem "foreman", "~> 0.90.0"
 gem "inline_svg", "~> 1.10"
 
 gem "openai", "~> 0.64.0"
+
+group :development, :test do
+  gem "dotenv-rails"
+end
+
+gem "faraday"
