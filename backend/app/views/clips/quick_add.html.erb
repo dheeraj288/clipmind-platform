@@ -39,6 +39,44 @@
             class: "w-full rounded-xl border border-slate-700 bg-slate-950 p-4 font-mono text-sm text-white outline-none focus:border-fuchsia-500" %>
       </div>
 
+      <div
+        data-controller="file-drop"
+        data-action="paste@window->file-drop#paste"
+        class="rounded-3xl border border-white/10 bg-white/[0.03] p-5"
+      >
+        <%= f.file_field :attachments,
+            multiple: true,
+            data: {
+              file_drop_target: "input",
+              action: "change->file-drop#pick"
+            },
+            class: "hidden" %>
+
+        <div
+          data-file-drop-target="dropzone"
+          data-action="click->file-drop#openPicker dragover->file-drop#dragOver dragleave->file-drop#dragLeave drop->file-drop#drop"
+          class="cursor-pointer rounded-3xl border-2 border-dashed border-white/10 bg-slate-950/60 px-6 py-10 text-center transition hover:border-fuchsia-400/40 hover:bg-fuchsia-500/5"
+        >
+          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-fuchsia-500/10 text-3xl">
+            📎
+          </div>
+
+          <h3 class="mt-4 text-lg font-black text-white">
+            Drop files here
+          </h3>
+
+          <p class="mt-2 text-sm text-slate-400">
+            Drag & drop images, PDFs, code files — or paste screenshot with Ctrl+V.
+          </p>
+
+          <p class="mt-3 text-xs text-slate-500">
+            Click to choose files manually.
+          </p>
+        </div>
+
+        <div data-file-drop-target="list" class="mt-4 grid gap-3"></div>
+      </div>
+
       <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
         <%= f.label :attachments, "Attach files / images", class: "mb-3 block text-sm font-bold text-slate-200" %>
 

@@ -4,4 +4,4 @@ import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
 eagerLoadControllersFrom("controllers", application)
 
 import FileDropController from "./file_drop_controller"
-application.register("file-drop", FileDropController)
+application.register("file-drop", FileDropController);
