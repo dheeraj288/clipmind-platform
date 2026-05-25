@@ -1,114 +1,56 @@
-<div class="mx-auto max-w-3xl">
+<div class="mx-auto max-w-4xl space-y-8">
+  <section class="relative overflow-hidden rounded-[36px] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl lg:p-8">
+    <div class="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-fuchsia-500/15 blur-3xl"></div>
+    <p class="text-xs font-black uppercase tracking-[0.28em] text-fuchsia-300">Manual capture</p>
+    <h1 class="mt-2 bg-gradient-to-r from-white via-fuchsia-100 to-cyan-200 bg-clip-text text-3xl font-black tracking-tight text-transparent lg:text-5xl">Quick Add Clip</h1>
+    <p class="mt-4 max-w-2xl text-sm leading-6 text-slate-400">Paste text, code, links, commands or attach files. ClipMind will organize everything automatically.</p>
+  </section>
 
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-white">
-      Quick Add Clip
-    </h1>
-
-    <p class="mt-2 text-slate-400">
-      Paste anything. ClipMind will auto-detect text, code, link, JSON, email or command.
-    </p>
-  </div>
-
-  <%= form_with model: @clip, url: clips_path, method: :post, data: { turbo: false } do |f| %>
-
-    <div class="space-y-6 rounded-3xl border border-slate-800 bg-slate-900 p-8">
-
-      <% if @clip.errors.any? %>
-        <div class="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
-          <%= @clip.errors.full_messages.to_sentence %>
-        </div>
-      <% end %>
-
-      <div>
-        <%= f.label :title, "Title optional",
-            class: "mb-2 block text-sm text-slate-300" %>
-
-        <%= f.text_field :title,
-            placeholder: "Leave blank for smart title",
-            class: "w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-white outline-none focus:border-fuchsia-500" %>
+  <%= form_with model: @clip, url: clips_path, method: :post, data: { turbo: false }, class: "space-y-5 rounded-[36px] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl lg:p-8" do |f| %>
+    <% if @clip.errors.any? %>
+      <div class="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+        <%= @clip.errors.full_messages.to_sentence %>
       </div>
+    <% end %>
 
-      <div>
-        <%= f.label :content,
-            class: "mb-2 block text-sm text-slate-300" %>
-
-        <%= f.text_area :content,
-            rows: 10,
-            placeholder: "Paste text, code, URL, JSON, email or terminal command...",
-            class: "w-full rounded-xl border border-slate-700 bg-slate-950 p-4 font-mono text-sm text-white outline-none focus:border-fuchsia-500" %>
-      </div>
-
-      <div
-        data-controller="file-drop"
-        data-action="paste@window->file-drop#paste"
-        class="rounded-3xl border border-white/10 bg-white/[0.03] p-5"
-      >
-        <%= f.file_field :attachments,
-            multiple: true,
-            data: {
-              file_drop_target: "input",
-              action: "change->file-drop#pick"
-            },
-            class: "hidden" %>
-
-        <div
-          data-file-drop-target="dropzone"
-          data-action="click->file-drop#openPicker dragover->file-drop#dragOver dragleave->file-drop#dragLeave drop->file-drop#drop"
-          class="cursor-pointer rounded-3xl border-2 border-dashed border-white/10 bg-slate-950/60 px-6 py-10 text-center transition hover:border-fuchsia-400/40 hover:bg-fuchsia-500/5"
-        >
-          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-fuchsia-500/10 text-3xl">
-            📎
-          </div>
-
-          <h3 class="mt-4 text-lg font-black text-white">
-            Drop files here
-          </h3>
-
-          <p class="mt-2 text-sm text-slate-400">
-            Drag & drop images, PDFs, code files — or paste screenshot with Ctrl+V.
-          </p>
-
-          <p class="mt-3 text-xs text-slate-500">
-            Click to choose files manually.
-          </p>
-        </div>
-
-        <div data-file-drop-target="list" class="mt-4 grid gap-3"></div>
-      </div>
-
-      <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
-        <%= f.label :attachments, "Attach files / images", class: "mb-3 block text-sm font-bold text-slate-200" %>
-
-        <%= f.file_field :attachments,
-            multiple: true,
-            direct_upload: true,
-            class: "block w-full cursor-pointer rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-slate-300 file:mr-4 file:rounded-xl file:border-0 file:bg-fuchsia-500/20 file:px-4 file:py-2 file:text-sm file:font-bold file:text-fuchsia-200 hover:bg-white/[0.05]" %>
-
-        <p class="mt-2 text-xs text-slate-500">
-          Supports images, PDFs, text files, and documents.
-        </p>
-      </div>
-
-      <div>
-        <%= f.label :collection_id, "Collection optional",
-            class: "mb-2 block text-sm text-slate-300" %>
-
-        <%= f.select :collection_id,
-            options_from_collection_for_select(@collections, :id, :name, @clip.collection_id),
-            { include_blank: "Auto collection" },
-            class: "w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-white outline-none focus:border-fuchsia-500" %>
-      </div>
-
-      <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-sm leading-6 text-indigo-100">
-        Clip type and language will be detected automatically.
-      </div>
-
-      <%= f.submit "Save Clip",
-          class: "w-full cursor-pointer rounded-xl bg-fuchsia-600 py-4 font-semibold text-white hover:bg-fuchsia-500" %>
-
+    <div>
+      <%= f.label :title, "Title optional", class: "mb-2 block text-sm font-bold text-slate-300" %>
+      <%= f.text_field :title, placeholder: "Leave blank for smart title", class: "min-h-12 w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-fuchsia-400/40" %>
     </div>
 
-  <% end %>
+    <div>
+      <%= f.label :content, class: "mb-2 block text-sm font-bold text-slate-300" %>
+      <%= f.text_area :content, rows: 10, placeholder: "Paste text, code, URL, JSON, email or terminal command...", class: "w-full rounded-2xl border border-white/10 bg-slate-950/70 p-4 font-mono text-sm leading-7 text-white outline-none placeholder:text-slate-500 focus:border-fuchsia-400/40" %>
+    </div>
 
+    <div data-controller="file-drop" data-action="paste@window->file-drop#paste" class="rounded-[30px] border border-white/10 bg-white/[0.03] p-5">
+      <%= f.file_field :attachments,
+          multiple: true,
+          data: { file_drop_target: "input", action: "change->file-drop#pick" },
+          class: "hidden" %>
+
+      <div data-file-drop-target="dropzone" data-action="click->file-drop#openPicker dragover->file-drop#dragOver dragleave->file-drop#dragLeave drop->file-drop#drop" class="cursor-pointer rounded-[28px] border-2 border-dashed border-white/10 bg-slate-950/60 px-6 py-10 text-center transition hover:border-fuchsia-400/40 hover:bg-fuchsia-500/5">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-fuchsia-500/10 text-3xl">📎</div>
+        <h3 class="mt-4 text-lg font-black text-white">Drop files here</h3>
+        <p class="mt-2 text-sm text-slate-400">Drag & drop images, PDFs, code files — or paste screenshot with Ctrl+V.</p>
+        <p class="mt-3 text-xs text-slate-500">Click to choose files manually.</p>
+      </div>
+
+      <div data-file-drop-target="list" class="mt-4 grid gap-3"></div>
+    </div>
+
+    <div>
+      <%= f.label :collection_id, "Collection optional", class: "mb-2 block text-sm font-bold text-slate-300" %>
+      <%= f.select :collection_id,
+          options_from_collection_for_select(@collections, :id, :name, @clip.collection_id),
+          { include_blank: "Auto collection" },
+          class: "min-h-12 w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 text-sm text-white outline-none focus:border-fuchsia-400/40" %>
+    </div>
+
+    <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-sm leading-6 text-indigo-100">
+      Clip type, language, smart tags, collection and AI jobs will run automatically in background.
+    </div>
+
+    <%= f.submit "Save Clip", class: "min-h-14 w-full cursor-pointer rounded-2xl bg-gradient-to-r from-fuchsia-600 to-indigo-600 py-4 font-black text-white shadow-lg shadow-fuchsia-950/30 transition hover:-translate-y-0.5" %>
+  <% end %>
 </div>

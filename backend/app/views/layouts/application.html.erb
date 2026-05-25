@@ -10,20 +10,23 @@
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
   </head>
 
-  <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+  <body class="m-0 min-h-screen overflow-x-hidden bg-[#050713] p-0 text-slate-100 antialiased selection:bg-fuchsia-500/30 selection:text-white">
     <% if current_user %>
-      <div class="flex min-h-screen bg-slate-950">
-        <aside class="fixed left-0 top-0 h-screen w-64 shrink-0 border-r border-slate-800 bg-[#050816]">
-          <%= render "shared/sidebar" %>
-        </aside>
+      <div class="fixed inset-0 -z-10 overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.11),transparent_34%),linear-gradient(180deg,#050713_0%,#070A14_45%,#020617_100%)]"></div>
+      <div class="fixed left-[260px] top-8 -z-10 h-72 w-72 rounded-full bg-fuchsia-500/10 blur-3xl"></div>
+      <div class="fixed bottom-10 right-10 -z-10 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl"></div>
 
-        <main class="ml-64 flex min-w-0 flex-1 flex-col">
+      <div class="flex min-h-screen">
+        <%= render "shared/sidebar" %>
+
+        <main class="min-w-0 flex-1">
           <%= render "shared/topbar" %>
 
-          <section class="flex-1 px-6 py-6">
+          <section class="mx-auto w-full max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
             <%= yield %>
           </section>
         </main>
@@ -59,3 +62,5 @@
     </script>
   </body>
 </html>
+
+

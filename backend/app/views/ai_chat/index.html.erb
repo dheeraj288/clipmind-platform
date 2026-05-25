@@ -1,31 +1,50 @@
-<div class="mx-auto max-w-4xl">
+<div class="mx-auto max-w-5xl space-y-8">
+  <section class="relative overflow-hidden rounded-[36px] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl lg:p-8">
+    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-fuchsia-500/15 blur-3xl"></div>
+    <div class="absolute -bottom-20 left-1/4 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl"></div>
 
-<h1 class="mb-6 text-3xl font-bold text-white">
-AI Memory Chat
-</h1>
+    <div class="relative">
+      <p class="text-xs font-black uppercase tracking-[0.28em] text-cyan-300">Ask your memory</p>
+      <h1 class="mt-2 bg-gradient-to-r from-white via-cyan-100 to-fuchsia-200 bg-clip-text text-3xl font-black tracking-tight text-transparent lg:text-5xl">AI Memory Chat</h1>
+      <p class="mt-4 max-w-2xl text-sm leading-6 text-slate-400">Ask questions about your saved clips, learning history and AI summaries.</p>
+    </div>
 
-<%= form_with url: ai_chat_path, data: { turbo: false } do |f| %>
-<div class="flex gap-3">
+    <%= form_with url: ai_chat_path, data: { turbo: false }, class: "relative mt-8" do |f| %>
+      <div class="rounded-[28px] border border-white/10 bg-slate-950/70 p-3 shadow-inner shadow-black/20">
+        <div class="flex flex-col gap-3 lg:flex-row">
+          <%= f.text_field :message,
+              class: "min-h-14 flex-1 rounded-2xl border border-white/10 bg-white/[0.04] px-5 text-sm font-medium text-white outline-none placeholder:text-slate-500 focus:border-cyan-400/40",
+              placeholder: "Ask: What did I learn today?" %>
 
-<%= f.text_field :message,
-class:"flex-1 rounded-2xl bg-slate-900 px-5 py-4 text-white",
-placeholder:"Ask: What did I learn today?" %>
+          <%= f.submit "Ask AI",
+              class: "min-h-14 cursor-pointer rounded-2xl bg-gradient-to-r from-fuchsia-600 to-cyan-500 px-8 text-sm font-black text-white shadow-lg shadow-fuchsia-950/30 transition hover:-translate-y-0.5" %>
+        </div>
+      </div>
+    <% end %>
+  </section>
 
-<%= f.submit "Ask",
-class:"rounded-2xl bg-fuchsia-600 px-6 py-4 text-white" %>
+  <% if @response.present? %>
+    <section class="rounded-[32px] border border-fuchsia-400/20 bg-fuchsia-500/5 p-6 shadow-2xl shadow-black/10 backdrop-blur-xl">
+      <div class="mb-4 flex items-center gap-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-fuchsia-500/10 text-fuchsia-200">✨</div>
+        <div>
+          <h2 class="text-lg font-black text-white">AI Response</h2>
+          <p class="text-xs text-slate-500">Generated from your ClipMind memory.</p>
+        </div>
+      </div>
 
-</div>
-
-<% end %>
-
-<% if @response.present? %>
-
-<div class="mt-8 rounded-3xl border border-fuchsia-500/20 p-6">
-
-<pre class="whitespace-pre-wrap text-slate-300"><%= @response %></pre>
-
-</div>
-
-<% end %>
-
+      <div class="rounded-2xl border border-white/10 bg-black/25 p-5">
+        <pre class="whitespace-pre-wrap text-sm leading-7 text-slate-300"><%= @response %></pre>
+      </div>
+    </section>
+  <% else %>
+    <section class="grid gap-4 md:grid-cols-3">
+      <% ["What did I learn today?", "Show my Rails clips", "Summarize my recent commands"].each do |question| %>
+        <div class="rounded-[26px] border border-white/10 bg-white/[0.04] p-5 text-sm font-semibold text-slate-300 backdrop-blur-xl">
+          <span class="text-slate-500">Try:</span>
+          <p class="mt-2 text-white"><%= question %></p>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
 </div>

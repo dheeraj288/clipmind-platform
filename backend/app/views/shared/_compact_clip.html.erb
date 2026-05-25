@@ -1,70 +1,51 @@
-<div class="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition hover:border-fuchsia-500/30 hover:bg-white/[0.06]">
-
+<div class="group overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] shadow-xl shadow-black/10 backdrop-blur-xl transition hover:-translate-y-1 hover:border-fuchsia-400/25 hover:bg-white/[0.06]">
   <% if clip.preview_image.present? %>
-    <div class="h-28 overflow-hidden border-b border-white/5 bg-slate-900">
-      <%= image_tag clip.preview_image,
-          class: "h-full w-full object-cover transition duration-500 group-hover:scale-105",
-          alt: "" %>
+    <div class="h-32 overflow-hidden border-b border-white/5 bg-slate-900">
+      <%= image_tag clip.preview_image, class: "h-full w-full object-cover transition duration-500 group-hover:scale-105", alt: "" %>
     </div>
   <% end %>
 
-  <div class="p-4">
-    <div class="mb-3 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2">
-        <span class="rounded-full bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-200">
+  <div class="p-5">
+    <div class="mb-4 flex items-center justify-between gap-3">
+      <div class="flex min-w-0 items-center gap-2">
+        <span class="rounded-full border border-indigo-400/20 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-indigo-200">
           <%= clip.clip_type %>
         </span>
 
         <% if clip.language.present? %>
-          <span class="rounded-full bg-fuchsia-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-fuchsia-200">
+          <span class="rounded-full border border-fuchsia-400/20 bg-fuchsia-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-fuchsia-200">
             <%= clip.language %>
           </span>
         <% end %>
       </div>
 
-      <span class="text-[11px] text-slate-500">
-        <%= time_ago_in_words(clip.created_at) %> ago
-      </span>
+      <span class="shrink-0 text-[11px] font-semibold text-slate-500"><%= time_ago_in_words(clip.created_at) %> ago</span>
     </div>
 
     <% if clip.page_title.present? || clip.source_url.present? %>
       <div class="mb-3 flex items-center gap-3">
         <% if clip_favicon_url(clip).present? %>
-          <%= image_tag clip_favicon_url(clip),
-              class: "h-8 w-8 rounded-lg object-cover",
-              alt: "" %>
+          <%= image_tag clip_favicon_url(clip), class: "h-9 w-9 rounded-xl object-cover ring-1 ring-white/10", alt: "" %>
+        <% else %>
+          <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.05] text-slate-400">🌐</div>
         <% end %>
 
         <div class="min-w-0">
-          <h3 class="line-clamp-1 text-sm font-bold text-white">
-            <%= clip.page_title.presence || clean_clip_title(clip) %>
-          </h3>
-
+          <h3 class="line-clamp-1 text-sm font-black text-white"><%= clip.page_title.presence || clean_clip_title(clip) %></h3>
           <% if clip.source_url.present? %>
-            <p class="truncate text-xs text-slate-500">
-              <%= clip.site_name.presence || clip_domain(clip) %>
-            </p>
+            <p class="truncate text-xs text-slate-500"><%= clip.site_name.presence || clip_domain(clip) %></p>
           <% end %>
         </div>
       </div>
     <% else %>
-      <h3 class="line-clamp-1 text-sm font-bold text-white">
-        <%= clean_clip_title(clip) %>
-      </h3>
+      <h3 class="line-clamp-1 text-sm font-black text-white"><%= clean_clip_title(clip) %></h3>
     <% end %>
 
-    <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-400">
-      <%= clip.page_description.presence || clip.content %>
-    </p>
+    <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-400"><%= clip.page_description.presence || clip.content %></p>
 
-    <div class="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
-      <span class="text-xs text-slate-500">
-        ⚡ <%= clip.copy_count || 0 %> copies
-      </span>
-
-      <%= link_to "Open",
-          clips_path(anchor: dom_id(clip)),
-          class: "text-xs font-bold text-fuchsia-400 hover:text-fuchsia-300" %>
+    <div class="mt-5 flex items-center justify-between border-t border-white/10 pt-4">
+      <span class="rounded-full bg-white/[0.04] px-3 py-1.5 text-xs font-bold text-slate-400">⚡ <%= clip.copy_count || 0 %> copies</span>
+      <%= link_to "Open", clips_path(anchor: dom_id(clip)), class: "rounded-full border border-fuchsia-400/20 bg-fuchsia-500/10 px-3 py-1.5 text-xs font-black text-fuchsia-200 transition hover:bg-fuchsia-500/20" %>
     </div>
   </div>
 </div>

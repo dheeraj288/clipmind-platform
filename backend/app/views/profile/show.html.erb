@@ -1,83 +1,53 @@
 <div class="space-y-8">
-  <section>
-    <h1 class="text-2xl font-bold text-white">Profile</h1>
+  <section class="relative overflow-hidden rounded-[36px] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl lg:p-8">
+    <div class="absolute -right-16 -top-16 h-60 w-60 rounded-full bg-fuchsia-500/15 blur-3xl"></div>
 
-    <p class="mt-2 text-sm text-slate-400">
-      Your ClipMind profile and activity.
-    </p>
-  </section>
-
-  <section class="rounded-3xl border border-fuchsia-500/20 bg-gradient-to-br from-fuchsia-950/70 to-cyan-950/40 p-8">
-    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
       <div class="flex items-center gap-5">
-        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-2xl font-bold text-white">
+        <div class="flex h-20 w-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-fuchsia-500 via-violet-600 to-cyan-400 text-3xl font-black text-white shadow-xl shadow-fuchsia-950/40">
           <%= current_user.name.to_s.first&.upcase || current_user.email.first.upcase %>
         </div>
 
         <div>
-          <h2 class="text-2xl font-bold text-white">
-            <%= current_user.name.presence || "ClipMind User" %>
-          </h2>
-
-          <p class="mt-1 text-sm text-slate-300">
-            Pro Member
-          </p>
-
-          <p class="mt-3 text-sm text-slate-400">
-            <%= current_user.email %>
-          </p>
+          <p class="text-xs font-black uppercase tracking-[0.25em] text-fuchsia-300">Profile</p>
+          <h1 class="mt-2 text-3xl font-black text-white"><%= current_user.name.presence || "ClipMind User" %></h1>
+          <p class="mt-2 text-sm text-slate-400"><%= current_user.email %></p>
         </div>
       </div>
 
-      <button class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700">
-        Edit Profile
-      </button>
+      <div class="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-black text-slate-200">Pro Workspace</div>
     </div>
   </section>
 
   <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-      <p class="text-sm text-slate-400">Total Clips</p>
-      <h3 class="mt-3 text-3xl font-bold text-white"><%= @total_clips %></h3>
-    </div>
-
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-      <p class="text-sm text-slate-400">Collections</p>
-      <h3 class="mt-3 text-3xl font-bold text-white"><%= @collections_count %></h3>
-    </div>
-
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-      <p class="text-sm text-slate-400">Favorites</p>
-      <h3 class="mt-3 text-3xl font-bold text-white"><%= @favorites_count %></h3>
-    </div>
-
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-      <p class="text-sm text-slate-400">Total Copies</p>
-      <h3 class="mt-3 text-3xl font-bold text-white"><%= @copies_count %></h3>
-    </div>
+    <% [["Total Clips", @total_clips, "📋"], ["Collections", @collections_count, "🗂️"], ["Favorites", @favorites_count, "⭐"], ["Total Copies", @copies_count, "⚡"]].each do |label, value, icon| %>
+      <div class="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-xl shadow-black/10 backdrop-blur-xl">
+        <div class="text-2xl"><%= icon %></div>
+        <p class="mt-4 text-xs font-black uppercase tracking-[0.2em] text-slate-500"><%= label %></p>
+        <h3 class="mt-2 text-3xl font-black text-white"><%= value %></h3>
+      </div>
+    <% end %>
   </section>
 
-  <section class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-    <h2 class="text-lg font-bold text-white">Recent Activity</h2>
+  <section class="rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/10 backdrop-blur-xl">
+    <div class="mb-5 flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-black text-white">Recent Activity</h2>
+        <p class="mt-1 text-sm text-slate-500">Latest clips saved in your workspace.</p>
+      </div>
+    </div>
 
-    <div class="mt-5 space-y-3">
+    <div class="space-y-3">
       <% if @recent_clips.any? %>
         <% @recent_clips.each do |clip| %>
-          <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+          <div class="rounded-2xl border border-white/10 bg-slate-950/50 p-4 transition hover:bg-white/[0.04]">
             <div class="flex items-center justify-between gap-4">
-              <div>
-                <p class="font-semibold text-white">
-                  <%= clip.title.presence || clip.clip_type.to_s.titleize %>
-                </p>
-
-                <p class="mt-1 text-xs text-slate-500">
-                  <%= time_ago_in_words(clip.created_at) %> ago
-                </p>
+              <div class="min-w-0">
+                <p class="truncate font-bold text-white"><%= clip.title.presence || clip.clip_type.to_s.titleize %></p>
+                <p class="mt-1 text-xs text-slate-500"><%= time_ago_in_words(clip.created_at) %> ago</p>
               </div>
 
-              <span class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">
-                <%= clip.clip_type %>
-              </span>
+              <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-bold text-slate-400"><%= clip.clip_type %></span>
             </div>
           </div>
         <% end %>
