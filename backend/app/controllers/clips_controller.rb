@@ -194,7 +194,11 @@ class ClipsController < ApplicationController
 
   def summarize
     @clip = current_user.clips.find(params[:id])
-    @summary = ClipSummaryService.new(@clip).call
+    ClipAiSummaryJob.perform_later(@clip.id)
+
+    @summary =
+      @clip.ai_summary.presence ||
+      "Summary:\nAI summary background job me generate ho rahi hai.\n\nKey Points:\n• Page refresh karo ya thodi der baad check karo.\n\nSuggested Action:\n• Sidekiq worker running hai ya nahi check karo."
 
     respond_to do |format|
       format.turbo_stream

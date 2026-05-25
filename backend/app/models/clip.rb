@@ -1,7 +1,11 @@
 class Clip < ApplicationRecord
 before_create :set_defaults
+before_create :set_ai_defaults
+
+
 after_create_commit :broadcast_new_clip
 after_create_commit :auto_assign_collection
+after_create_commit :enqueue_post_processing
   
 
   belongs_to :user
@@ -48,6 +52,14 @@ after_create_commit :auto_assign_collection
     command: "command"
   }
 
+
+  enum ai_status: {
+    pending: "pending",
+    processing: "processing",
+    completed: "completed",
+    failed: "failed"
+  }
+
   def set_defaults
     self.copy_count ||= 0
     self.is_favorite ||= false
@@ -55,83 +67,88 @@ after_create_commit :auto_assign_collection
   end
 
   def related(limit = 5)
-  tag_values =
-    if tags.is_a?(Array)
-      tags
-    elsif tags.is_a?(Hash)
-      tags.values.flatten
-    else
-      []
-    end
+    tag_values =
+      if tags.is_a?(Array)
+        tags
+      elsif tags.is_a?(Hash)
+        tags.values.flatten
+      else
+        []
+      end
 
-  tag_values = tag_values.compact.map(&:to_s).uniq
+    tag_values = tag_values.compact.map(&:to_s).uniq
 
-  words =
-    content.to_s
-           .downcase
-           .scan(/[a-z0-9_]{4,}/)
-           .uniq
-           .first(8)
+    words =
+      content.to_s
+             .downcase
+             .scan(/[a-z0-9_]{4,}/)
+             .uniq
+             .first(8)
 
-  base =
-    self.class
-        .active
-        .where(user_id: user_id)
-        .where.not(id: id)
+    base =
+      self.class
+          .active
+          .where(user_id: user_id)
+          .where.not(id: id)
 
-  candidates =
-    base
-      .limit(80)
-      .to_a
+    candidates =
+      base
+        .limit(80)
+        .to_a
 
-  ranked =
-    candidates.map do |candidate|
-      score = 0
+    ranked =
+      candidates.map do |candidate|
+        score = 0
 
-      candidate_tags =
-        if candidate.tags.is_a?(Array)
-          candidate.tags
-        elsif candidate.tags.is_a?(Hash)
-          candidate.tags.values.flatten
-        else
-          []
+        candidate_tags =
+          if candidate.tags.is_a?(Array)
+            candidate.tags
+          elsif candidate.tags.is_a?(Hash)
+            candidate.tags.values.flatten
+          else
+            []
+          end
+
+        candidate_tags = candidate_tags.compact.map(&:to_s).uniq
+
+        matched_tags = tag_values & candidate_tags
+        score += matched_tags.size * 5
+
+        if collection_id.present? && candidate.collection_id == collection_id
+          score += 4
         end
 
-      candidate_tags = candidate_tags.compact.map(&:to_s).uniq
+        if clip_type.present? && candidate.clip_type == clip_type
+          score += 2
+        end
 
-      matched_tags = tag_values & candidate_tags
-      score += matched_tags.size * 5
+        candidate_words =
+          candidate.content.to_s
+                   .downcase
+                   .scan(/[a-z0-9_]{4,}/)
+                   .uniq
 
-      if collection_id.present? && candidate.collection_id == collection_id
-        score += 4
+        matched_words = words & candidate_words
+        score += matched_words.size
+
+        score += 1 if candidate.created_at > 7.days.ago
+
+        [candidate, score]
       end
 
-      if clip_type.present? && candidate.clip_type == clip_type
-        score += 2
-      end
-
-      candidate_words =
-        candidate.content.to_s
-                 .downcase
-                 .scan(/[a-z0-9_]{4,}/)
-                 .uniq
-
-      matched_words = words & candidate_words
-      score += matched_words.size
-
-      score += 1 if candidate.created_at > 7.days.ago
-
-      [candidate, score]
-    end
-
-  ranked
-    .select { |_, score| score.positive? }
-    .sort_by { |candidate, score| [-score, -candidate.created_at.to_i] }
-    .map(&:first)
-    .first(limit)
-end
+    ranked
+      .select { |_, score| score.positive? }
+      .sort_by { |candidate, score| [-score, -candidate.created_at.to_i] }
+      .map(&:first)
+      .first(limit)
+  end
 
   private
+
+  def set_ai_defaults
+    self.ai_status ||= "pending"
+  end
+
 
   def broadcast_new_clip
     broadcast_prepend_to(
@@ -143,6 +160,10 @@ end
         collections: user.collections.order(:name)
       }
     )
+  end
+
+  def enqueue_post_processing
+    ClipPostProcessJob.perform_later(id)
   end
 
   def auto_assign_collection

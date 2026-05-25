@@ -36,6 +36,8 @@
           </span>
         <% end %>
 
+        <%= render "clips/ai_status", clip: clip %>
+
         <% if clip.is_pinned? %>
           <span class="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-2.5 py-1 text-[10px] text-cyan-100">
             📌 Pinned
@@ -46,7 +48,6 @@
           <%= time_ago_in_words(clip.created_at) %> ago
         </span>
       </div>
-
       <% unless ["code", "json", "command"].include?(clip.clip_type.to_s) %>
         <h2 class="line-clamp-1 text-lg font-bold tracking-tight text-white">
           <%= clean_clip_title(clip) %>
