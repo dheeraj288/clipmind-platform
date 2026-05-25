@@ -3,3 +3,5 @@ import { application } from "controllers/application"
 import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
 eagerLoadControllersFrom("controllers", application)
 
+import BulkActionsController from "./bulk_actions_controller"
+application.register("bulk-actions", BulkActionsController);

@@ -27,6 +27,9 @@ Rails.application.routes.draw do
       patch :increment_copy
       patch :toggle_pin
       post :summarize
+      post :save_ai_memory
+      post :regenerate_summary
+      post :hide_summary 
     end
   end
 

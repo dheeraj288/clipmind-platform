@@ -10,6 +10,7 @@ class ClipSummaryService
   end
 
   def call
+    return @clip.ai_summary if cached_summary?
     return error_message("No content available to summarize.") if @content.blank?
     return error_message("Gemini API key missing. Add GEMINI_API_KEY in backend/.env") if api_key.blank?
 
@@ -25,13 +26,26 @@ class ClipSummaryService
       return error_message("Gemini API error: #{response.status}. Check API key, model, or free-tier limit.")
     end
 
-    parse_response(response.body).presence || error_message("Gemini returned empty summary.")
+    summary = parse_response(response.body).presence || error_message("Gemini returned empty summary.")
+
+    @clip.update(
+      ai_summary: summary,
+      ai_summary_generated_at: Time.current
+    )
+
+    summary
   rescue StandardError => e
     Rails.logger.error("Gemini summary exception: #{e.class} - #{e.message}")
     error_message("AI summary unavailable right now. #{e.message}")
   end
 
   private
+
+  def cached_summary?
+    @clip.respond_to?(:ai_summary) &&
+      @clip.ai_summary.present? &&
+      @clip.ai_summary_generated_at.present?
+  end
 
   def api_key
     ENV["GEMINI_API_KEY"].to_s.strip

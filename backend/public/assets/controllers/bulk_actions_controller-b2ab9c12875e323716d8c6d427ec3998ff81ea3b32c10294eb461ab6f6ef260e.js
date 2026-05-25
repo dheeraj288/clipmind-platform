@@ -53,4 +53,4 @@ export default class extends Controller {
       .map((checkbox) => checkbox.value)
       .filter(Boolean)
   }
-}
+};

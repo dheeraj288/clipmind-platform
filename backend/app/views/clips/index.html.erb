@@ -6,11 +6,10 @@
   <div class="absolute bottom-0 right-0 h-[500px] w-[500px] rounded-full bg-indigo-600/10 blur-3xl"></div>
 </div>
 
-<div class="space-y-8" data-controller="bulk-actions">
+<div class="space-y-8">
 
   <!-- Header -->
   <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-
     <div>
       <h1 class="bg-gradient-to-r from-white via-fuchsia-200 to-indigo-300 bg-clip-text text-4xl font-black tracking-tight text-transparent">
         All Clips
@@ -24,7 +23,6 @@
     <div class="rounded-2xl border border-white/10 bg-black/30 px-5 py-3 text-sm font-semibold text-slate-200 backdrop-blur-xl">
       <%= pluralize(@clips.count, "clip") %>
     </div>
-
   </div>
 
   <!-- Search -->
@@ -34,14 +32,11 @@
       data: { turbo_frame: "clips_list" } do %>
 
     <div class="grid gap-4 xl:grid-cols-[1fr_240px_140px]">
-
-      <!-- Search Input -->
       <%= text_field_tag :q,
           @query,
           placeholder: "Search clips...",
           class: "rounded-2xl border border-white/10 bg-slate-950/80 px-5 py-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10" %>
 
-      <!-- Filter -->
       <%= select_tag :filter,
           options_for_select([
             ["All Types", "all"],
@@ -54,147 +49,107 @@
           ], @filter),
           class: "rounded-2xl border border-white/10 bg-slate-950/80 px-5 py-4 text-sm text-white outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" %>
 
-      <!-- Search Button -->
       <%= submit_tag "Search",
           class: "cursor-pointer rounded-2xl bg-gradient-to-r from-fuchsia-600 to-indigo-600 px-5 py-4 text-sm font-bold text-white shadow-lg shadow-fuchsia-900/30 transition hover:scale-[1.02] hover:opacity-90" %>
-
     </div>
-
   <% end %>
 
-  <!-- Bulk Actions -->
-  <div class="sticky top-4 z-30 flex flex-col gap-4 rounded-[24px] border border-white/10 bg-black/30 p-4 backdrop-blur-2xl lg:flex-row lg:items-center lg:justify-between">
-
-    <!-- Select All -->
-    <label class="flex items-center gap-3 text-sm font-semibold text-slate-300">
-
-      <input
-        type="checkbox"
-        data-action="change->bulk-actions#toggleAll"
-        class="h-4 w-4 rounded border-slate-700 bg-slate-950 accent-fuchsia-600"
-      >
-
-      Select all clips
-
-    </label>
-
-    <!-- Bulk Action Bar -->
-    <div
-      data-bulk-actions-target="bar"
-      class="hidden flex-wrap items-center gap-3 rounded-2xl border border-fuchsia-500/20 bg-fuchsia-500/10 px-4 py-3 backdrop-blur-xl"
-    >
-
-      <span class="text-sm font-semibold text-fuchsia-200">
-        <span data-bulk-actions-target="count">0</span> selected
-      </span>
-
-      <!-- Favorite -->
-      <%= form_with url: bulk_favorite_clips_path,
-          method: :patch,
-          data: { turbo: false },
-          class: "inline-block" do %>
-
-        <%= hidden_field_tag :clip_ids, "", data: { bulk_actions_target: "clipIds" } %>
-
-        <%= submit_tag "Favorite",
-            class: "cursor-pointer rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500 hover:text-white" %>
-
-      <% end %>
-
-      <!-- Pin -->
-      <%= form_with url: bulk_pin_clips_path,
-          method: :patch,
-          data: { turbo: false },
-          class: "inline-block" do %>
-
-        <%= hidden_field_tag :clip_ids, "", data: { bulk_actions_target: "clipIds" } %>
-
-        <%= submit_tag "Pin",
-            class: "cursor-pointer rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500 hover:text-white" %>
-
-      <% end %>
-
-      <!-- Delete -->
-      <%= form_with url: bulk_delete_clips_path,
-          method: :delete,
-          data: {
-            turbo: false,
-            turbo_confirm: "Are you sure you want to delete selected clips?"
-          },
-          class: "inline-block" do %>
-
-        <%= hidden_field_tag :clip_ids, "", data: { bulk_actions_target: "clipIds" } %>
-
-        <%= submit_tag "Delete",
-            class: "cursor-pointer rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-500 hover:text-white" %>
-
-      <% end %>
-
-    </div>
-
-  </div>
-
-  <!-- Clips -->
+  <!-- Clips + Bulk Actions -->
   <%= turbo_frame_tag "clips_list" do %>
+    <div class="space-y-6" data-controller="bulk-actions">
 
-    <div id="clips_list_items" class="grid gap-6">
+      <!-- Bulk Actions -->
+      <div class="sticky top-4 z-30 flex flex-col gap-4 rounded-[24px] border border-white/10 bg-black/30 p-4 backdrop-blur-2xl lg:flex-row lg:items-center lg:justify-between">
+        <label class="flex items-center gap-3 text-sm font-semibold text-slate-300">
+          <input
+            type="checkbox"
+            data-action="change->bulk-actions#toggleAll"
+            class="h-4 w-4 rounded border-slate-700 bg-slate-950 accent-fuchsia-600"
+          >
+          Select all clips
+        </label>
 
-      <% if @clips.any? %>
+        <div
+          data-bulk-actions-target="bar"
+          class="hidden flex-wrap items-center gap-3 rounded-2xl border border-fuchsia-500/20 bg-fuchsia-500/10 px-4 py-3 backdrop-blur-xl"
+        >
+          <span class="text-sm font-semibold text-fuchsia-200">
+            <span data-bulk-actions-target="count">0</span> selected
+          </span>
 
-        <% @clips.group_by { |c| clip_time_group(c.created_at) }.each do |group, clips| %>
-
-          <div class="mb-10">
-
-          <div class="mb-4 flex items-center gap-3">
-
-          <div class="h-px flex-1 bg-slate-800"></div>
-
-          <div class="rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-fuchsia-100">
-          <%= group %>
-          </div>
-
-          <div class="h-px flex-1 bg-slate-800"></div>
-
-          </div>
-
-          <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-
-          <% clips.each do |clip| %>
-
-          <%= render "shared/clip_card",
-              clip: clip,
-              collections: @collections %>
-
+          <%= form_with url: bulk_favorite_clips_path,
+              method: :patch,
+              data: { turbo: false },
+              class: "inline-block" do %>
+            <%= hidden_field_tag :clip_ids, "", data: { bulk_actions_target: "clipIds" } %>
+            <%= submit_tag "Favorite",
+                class: "cursor-pointer rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500 hover:text-white" %>
           <% end %>
 
-          </div>
-
-          </div>
-
+          <%= form_with url: bulk_pin_clips_path,
+              method: :patch,
+              data: { turbo: false },
+              class: "inline-block" do %>
+            <%= hidden_field_tag :clip_ids, "", data: { bulk_actions_target: "clipIds" } %>
+            <%= submit_tag "Pin",
+                class: "cursor-pointer rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-fuchsia-500/30 hover:bg-fuchsia-500 hover:text-white" %>
           <% end %>
-      <% else %>
 
-        <!-- Empty State -->
-        <div class="rounded-[30px] border border-dashed border-white/10 bg-black/20 px-10 py-20 text-center backdrop-blur-xl">
-
-          <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-fuchsia-500/10 text-5xl">
-            🔎
-          </div>
-
-          <h3 class="mt-6 text-2xl font-bold text-white">
-            No clips found
-          </h3>
-
-          <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-400">
-            Try changing your search query or filters to discover saved clips.
-          </p>
-
+          <%= form_with url: bulk_delete_clips_path,
+              method: :delete,
+              data: {
+                turbo: false,
+                turbo_confirm: "Are you sure you want to delete selected clips?"
+              },
+              class: "inline-block" do %>
+            <%= hidden_field_tag :clip_ids, "", data: { bulk_actions_target: "clipIds" } %>
+            <%= submit_tag "Delete",
+                class: "cursor-pointer rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-500 hover:text-white" %>
+          <% end %>
         </div>
+      </div>
 
-      <% end %>
+      <div id="clips_list_items" class="grid gap-6">
+        <% if @clips.any? %>
+          <% @clips.group_by { |c| clip_time_group(c.created_at) }.each do |group, clips| %>
+            <div class="mb-10">
+              <div class="mb-4 flex items-center gap-3">
+                <div class="h-px flex-1 bg-slate-800"></div>
+
+                <div class="rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-fuchsia-100">
+                  <%= group %>
+                </div>
+
+                <div class="h-px flex-1 bg-slate-800"></div>
+              </div>
+
+              <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <% clips.each do |clip| %>
+                  <%= render "shared/clip_card",
+                      clip: clip,
+                      collections: @collections %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="rounded-[30px] border border-dashed border-white/10 bg-black/20 px-10 py-20 text-center backdrop-blur-xl">
+            <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-fuchsia-500/10 text-5xl">
+              🔎
+            </div>
+
+            <h3 class="mt-6 text-2xl font-bold text-white">
+              No clips found
+            </h3>
+
+            <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-400">
+              Try changing your search query or filters to discover saved clips.
+            </p>
+          </div>
+        <% end %>
+      </div>
 
     </div>
-
   <% end %>
 
 </div>

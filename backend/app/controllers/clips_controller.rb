@@ -202,6 +202,49 @@ class ClipsController < ApplicationController
     end
   end
 
+  def save_ai_memory
+    @clip = current_user.clips.find(params[:id])
+
+    @clip.update!(
+      ai_memory: true,
+      ai_memory_saved_at: Time.current
+    )
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html do
+        redirect_back(
+          fallback_location: clips_path,
+          notice: "Saved to AI Memory"
+        )
+      end
+    end
+  end
+
+  def regenerate_summary
+    @clip = current_user.clips.find(params[:id])
+
+    @clip.update(
+      ai_summary: nil,
+      ai_summary_generated_at: nil
+    )
+
+    @summary = ClipSummaryService.new(@clip.reload).call
+
+    respond_to do |format|
+      format.turbo_stream { render :summarize }
+    end
+  end
+
+  def hide_summary
+    @clip = current_user.clips.find(params[:id])
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_back fallback_location: clips_path }
+    end
+  end
+
   private
 
   def clip_params

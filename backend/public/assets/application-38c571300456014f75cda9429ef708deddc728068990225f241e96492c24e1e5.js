@@ -15,4 +15,4 @@ document.addEventListener("toggle", (event) => {
   if (event.target.open && window.Prism) {
     window.Prism.highlightAllUnder(event.target)
   }
-}, true)
+}, true);

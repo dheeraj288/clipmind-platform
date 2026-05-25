@@ -1,23 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["checkbox", "bar", "count", "clipIds"]
+  static targets = ["checkbox", "selectAll", "bar", "count", "clipIds"]
 
   connect() {
-    console.log("✅ Bulk Actions Connected")
-    console.log("Checkbox targets:", this.checkboxTargets.length)
-    console.log("Bar target:", this.hasBarTarget)
-    console.log("Count target:", this.hasCountTarget)
-    console.log("ClipIds targets:", this.clipIdsTargets.length)
-
     this.update()
   }
 
   toggleAll(event) {
-    console.log("✅ Select all clicked:", event.target.checked)
+    const checked = event.target.checked
 
     this.checkboxTargets.forEach((checkbox) => {
-      checkbox.checked = event.target.checked
+      checkbox.checked = checked
     })
 
     this.update()
@@ -25,11 +19,11 @@ export default class extends Controller {
 
   update() {
     const selectedIds = this.selectedIds()
-
-    console.log("Selected IDs:", selectedIds)
+    const selectedCount = selectedIds.length
+    const totalCount = this.checkboxTargets.length
 
     if (this.hasCountTarget) {
-      this.countTarget.textContent = selectedIds.length
+      this.countTarget.textContent = selectedCount
     }
 
     this.clipIdsTargets.forEach((input) => {
@@ -37,13 +31,18 @@ export default class extends Controller {
     })
 
     if (this.hasBarTarget) {
-      if (selectedIds.length > 0) {
+      if (selectedCount > 0) {
         this.barTarget.classList.remove("hidden")
         this.barTarget.classList.add("flex")
       } else {
         this.barTarget.classList.add("hidden")
         this.barTarget.classList.remove("flex")
       }
+    }
+
+    if (this.hasSelectAllTarget) {
+      this.selectAllTarget.checked = totalCount > 0 && selectedCount === totalCount
+      this.selectAllTarget.indeterminate = selectedCount > 0 && selectedCount < totalCount
     }
   }
 
@@ -53,4 +52,4 @@ export default class extends Controller {
       .map((checkbox) => checkbox.value)
       .filter(Boolean)
   }
-}
+};
