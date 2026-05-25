@@ -1,6 +1,7 @@
 class Clip < ApplicationRecord
 before_create :set_defaults
 before_create :set_ai_defaults
+after_create_commit :enqueue_attachment_processing
 
 
 after_create_commit :broadcast_new_clip
@@ -148,8 +149,14 @@ after_create_commit :enqueue_post_processing
   def set_ai_defaults
     self.ai_status ||= "pending"
   end
+  
+  def enqueue_attachment_processing
+    return unless attachments.attached?
+    return if attachment_summary.present?
 
-
+    ClipAttachmentProcessingJob.perform_later(id)
+  end
+  
   def broadcast_new_clip
     broadcast_prepend_to(
       "user_#{user_id}_clips",

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_25_163404) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_25_174542) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -82,6 +82,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_25_163404) do
     t.datetime "ai_memory_saved_at"
     t.string "ai_status"
     t.text "ai_error"
+    t.text "attachment_summary"
+    t.jsonb "attachment_metadata"
     t.index ["collection_id"], name: "index_clips_on_collection_id"
     t.index ["copy_count"], name: "index_clips_on_copy_count"
     t.index ["tags"], name: "index_clips_on_tags", using: :gin
