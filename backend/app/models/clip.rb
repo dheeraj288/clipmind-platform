@@ -9,14 +9,15 @@ after_create_commit :auto_assign_collection
 
   has_many :clip_copy_logs, dependent: :destroy
 
+  has_many_attached :attachments
+
+  scope :active, -> { where(deleted_at: nil) }
+
   scope :most_used, -> { order(copy_count: :desc) }
 
   validates :content, presence: true
 
-  scope :active, -> {
-      where(deleted_at: nil)
-    }
-
+  
     scope :trending, -> {
 
       left_joins(:clip_copy_logs)

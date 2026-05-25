@@ -137,6 +137,51 @@
     <% end %>
   </div>
 
+  <% if clip.attachments.attached? %>
+      <div class="relative z-10 mt-4 space-y-3">
+        <% clip.attachments.each do |attachment| %>
+
+         <% if attachment.image? %>
+      <div class="overflow-hidden rounded-[22px] border border-white/10 bg-[#020617] p-3">
+        <%= link_to rails_blob_path(attachment, disposition: "inline"),
+            target: "_blank",
+            class: "block" do %>
+          <%= image_tag attachment,
+              class: "mx-auto max-h-44 w-auto max-w-full rounded-xl object-contain" %>
+        <% end %>
+      </div>
+
+      <% else %>
+        <%= link_to rails_blob_path(attachment, disposition: "attachment"),
+            class: "flex items-center justify-between rounded-[20px] border border-white/10 bg-white/[0.03] px-5 py-4 transition hover:border-fuchsia-500/30 hover:bg-white/[0.06]" do %>
+
+          <div class="flex items-center gap-3">
+            <div class="rounded-xl bg-fuchsia-500/10 p-3">
+              📎
+            </div>
+
+            <div>
+              <p class="text-sm font-semibold text-white">
+                <%= attachment.filename %>
+              </p>
+
+              <p class="text-xs text-slate-500">
+                <%= number_to_human_size(attachment.byte_size) %>
+              </p>
+            </div>
+          </div>
+
+          <span class="rounded-xl bg-fuchsia-500 px-4 py-2 text-xs font-bold text-white">
+            Download
+          </span>
+
+        <% end %>
+      <% end %>
+
+    <% end %>
+  </div>
+<% end %>
+
   <div id="clip_summary_<%= clip.id %>" class="relative z-10"></div>
 
   <div class="relative z-10 mt-5 border-t border-white/5 pt-4">

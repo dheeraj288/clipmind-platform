@@ -251,7 +251,8 @@ class ClipsController < ApplicationController
     params.require(:clip).permit(
       :title,
       :content,
-      :collection_id
+      :collection_id,
+      attachments: []
     )
   end
 
