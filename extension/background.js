@@ -1,6 +1,6 @@
 console.log("ClipMind background running")
 
-const API_BASE_URL = "http://localhost:3000/api/v1"
+import { API_BASE_URL } from "./config.js";
 
 const recentClips = new Map()
 const DUPLICATE_WINDOW = 3000

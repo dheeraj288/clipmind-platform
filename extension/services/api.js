@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000/api/v1";
+import { API_BASE_URL } from "./config.js";
 
 import { getToken, logoutUser } from "./auth.js";
 
