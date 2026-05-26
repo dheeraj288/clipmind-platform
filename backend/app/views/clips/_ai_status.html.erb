@@ -1,31 +1,33 @@
-<% if clip.pending? || clip.processing? %>
+<% status = clip.reload.ai_status.presence || "pending" %>
 
-  <div class="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-3 py-1 text-[10px] text-yellow-300">
+<% if status.in?(["pending","processing"]) %>
 
-    <div class="h-2 w-2 rounded-full bg-yellow-400 animate-pulse"></div>
+  <span class="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-3 py-1 text-[10px] text-yellow-300">
+
+    <span class="h-2 w-2 rounded-full bg-yellow-400 animate-pulse"></span>
 
     Generating...
 
-  </div>
+  </span>
 
-<% elsif clip.completed? %>
+<% elsif status=="completed" %>
 
-  <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] text-emerald-300">
+  <span class="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] text-emerald-300">
 
-    <div class="h-2 w-2 rounded-full bg-emerald-400"></div>
+    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
 
     Completed
 
-  </div>
+  </span>
 
-<% elsif clip.failed? %>
+<% elsif status=="failed" %>
 
-  <div class="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-[10px] text-red-300">
+  <span class="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-[10px] text-red-300">
 
-    <div class="h-2 w-2 rounded-full bg-red-400"></div>
+    <span class="h-2 w-2 rounded-full bg-red-400"></span>
 
     Failed
 
-  </div>
+  </span>
 
 <% end %>

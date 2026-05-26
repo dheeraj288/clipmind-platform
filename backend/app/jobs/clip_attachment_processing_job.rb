@@ -21,45 +21,56 @@ class ClipAttachmentProcessingJob < ApplicationJob
       }
     end
 
-    summary = build_attachment_summary(metadata)
+    extracted_text = clip.attachments.map do |attachment|
+      AttachmentAiService.new(attachment).call
+    end.join("\n\n")
+
+    attachment_summary = build_attachment_summary(metadata, extracted_text)
 
     clip.update!(
       attachment_metadata: metadata,
-      attachment_summary: summary,
-      ai_status: "completed"
+      attachment_summary: attachment_summary,
+      ai_status: "completed",
+      ai_error: nil
     )
 
+    broadcast_clip(clip)
+  rescue => e
+    clip&.update!(
+      ai_status: "failed",
+      ai_error: e.message
+    )
+
+    broadcast_clip(clip) if clip
+    Rails.logger.error(e.message)
+  end
+
+  private
+
+  def build_attachment_summary(metadata, extracted_text)
+    filenames = metadata.map { |file| file[:filename] }.join(", ")
+    file_types = metadata.map { |file| file[:content_type] }.compact.uniq.join(", ")
+
+    <<~SUMMARY.strip
+      Summary:
+      This clip includes attachment content that was processed in the background.
+
+      Key Points:
+      • Files: #{filenames}
+      • File types: #{file_types.presence || "unknown"}
+      • Extracted content preview: #{extracted_text.to_s.truncate(600)}
+
+      Suggested Action:
+      • Use this attachment summary to quickly understand the uploaded file.
+    SUMMARY
+  end
+
+  def broadcast_clip(clip)
     Turbo::StreamsChannel.broadcast_replace_to(
       "user_#{clip.user_id}_clips",
       target: ActionView::RecordIdentifier.dom_id(clip),
       partial: "shared/clip_card",
       locals: { clip: clip.reload }
     )
-  rescue => e
-    clip.update!(
-      ai_status: "failed",
-      ai_error: e.message
-    )
-  end
-
-  private
-
-  def build_attachment_summary(metadata)
-    total_files = metadata.size
-    image_count = metadata.count { |file| file[:image] }
-    file_types = metadata.map { |file| file[:content_type] }.compact.uniq.join(", ")
-
-    <<~SUMMARY.strip
-      Summary:
-      This clip has #{total_files} attachment#{'s' if total_files > 1}.
-
-      Key Points:
-      • Images: #{image_count}
-      • File types: #{file_types.presence || "unknown"}
-      • Files: #{metadata.map { |file| file[:filename] }.join(", ")}
-
-      Suggested Action:
-      • Review the attachment preview and use AI summary for context.
-    SUMMARY
   end
 end
