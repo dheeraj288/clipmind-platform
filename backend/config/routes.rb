@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       patch :bulk_favorite
       patch :bulk_pin
       delete :bulk_delete
+      patch :bulk_action
     end
 
     member do
