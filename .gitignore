@@ -8,6 +8,7 @@
 backend/.env
 backend/.env.*
 backend/config/master.key
+backend/config/credentials/*.key
 
 # Bundler
 backend/.bundle/
@@ -23,3 +24,7 @@ backend/storage/*
 
 # Rails assets
 backend/public/assets/
+
+# Local database / editor
+*.sqlite3
+.vscode/
