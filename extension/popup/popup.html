@@ -26,6 +26,8 @@
 
 <body>
 
+  <div id="global-error" class="global-error hidden"></div>
+
   <!-- AUTH SCREEN -->
   <div id="auth-container"></div>
 
@@ -34,22 +36,22 @@
 
     <!-- HEADER -->
     <header class="header">
-
       <div class="header-left">
-
-        <div class="logo">📋</div>
+        <div class="logo">🧠</div>
 
         <div class="title">
-          <h1>Clipboard Pro</h1>
-          <p>Smart clipboard manager</p>
-        </div>
+          <h1>ClipMind</h1>
+          <p>AI clipboard workspace</p>
 
+          <div id="server-status" class="server-status">
+            Checking...
+          </div>
+        </div>
       </div>
 
       <button id="logout-btn" class="logout-btn">
         Logout
       </button>
-
     </header>
 
     <!-- SEARCH -->

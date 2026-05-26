@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./config.js";
+import { API_BASE_URL } from "../config.js";
 
 const LOCAL_CLIPS_KEY = "clips";
 

@@ -1,9 +1,11 @@
 module Jwt
   class Encoder
-    SECRET_KEY = Rails.application.credentials.secret_key_base
-
     def self.call(payload)
-      JWT.encode(payload, SECRET_KEY)
+      JWT.encode(payload, secret_key, "HS256")
+    end
+
+    def self.secret_key
+      ENV["JWT_SECRET"].presence || Rails.application.secret_key_base
     end
   end
 end

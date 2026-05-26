@@ -1,7 +1,7 @@
 import { createCard } from "./components/ClipCard.js";
 import { groupItems } from "./utils/groupItems.js";
 import { sortData } from "./utils/smartScore.js";
-import { fetchClips, fetchTrendingClips } from "../services/api.js";
+import { fetchClips, fetchTrendingClips, checkBackendHealth } from "../services/api.js";
 import { syncPendingClips } from "../services/syncQueue.js";
 import { smartSearch } from "./utils/smartSearch.js";
 import { getRecommendations } from "./utils/aiMemory.js";
@@ -21,10 +21,25 @@ let data = [];
 let currentFilter = "all";
 
 /* FILTER */
-const filterData = (items) =>
-  currentFilter === "all"
-    ? items
-    : items.filter((i) => i.clip_type === currentFilter);
+const filterData = (items = []) => {
+  if (currentFilter === "all") return items;
+
+  return items.filter((item) => item.clip_type === currentFilter);
+};
+
+/* SERVER STATUS */
+async function updateBackendStatus() {
+  const indicator = document.getElementById("server-status");
+  if (!indicator) return;
+
+  indicator.innerHTML = "Checking...";
+
+  const healthy = await checkBackendHealth();
+
+  indicator.innerHTML = healthy
+    ? "🟢 Backend Online"
+    : "🔴 Backend Offline";
+}
 
 /* LOGOUT */
 function setupLogout() {
@@ -39,6 +54,8 @@ function setupLogout() {
 
 /* RENDER */
 function render(items = []) {
+  if (!list) return;
+
   list.innerHTML = "";
 
   const finalData = filterData(sortData(items));
@@ -48,42 +65,36 @@ function render(items = []) {
     return;
   }
 
-  const groups = groupItems(finalData);
   const recommended = getRecommendations(finalData);
+
   if (recommended.length) {
+    const recSection = document.createElement("div");
+    recSection.className = "timeline-section";
 
-  const recSection =
-    document.createElement("div");
+    recSection.innerHTML = `
+      <div class="timeline-title">
+        🧠 RECOMMENDED FOR YOU
+      </div>
+    `;
 
-  recSection.className =
-    "timeline-section";
+    recommended.forEach((item) => {
+      recSection.appendChild(
+        createCard(item, {
+          showToast: (message) => showToast(toast, message),
+          load,
+          render,
+          data,
+        })
+      );
+    });
 
-  recSection.innerHTML = `
-    <div class="timeline-title">
-      🧠 RECOMMENDED FOR YOU
-    </div>
-  `;
+    list.appendChild(recSection);
+  }
 
-  recommended.forEach((item) => {
+  const groups = groupItems(finalData);
 
-    recSection.appendChild(
-      createCard(item, {
-        showToast: (message) =>
-          showToast(toast, message),
-
-        load,
-        render,
-        data,
-      })
-    );
-
-  });
-
-  list.appendChild(recSection);
-}
-
-  Object.entries(groups).forEach(([title, items]) => {
-    if (!items.length) return;
+  Object.entries(groups).forEach(([title, groupItems]) => {
+    if (!groupItems.length) return;
 
     const section = document.createElement("div");
     section.className = "timeline-section";
@@ -94,7 +105,7 @@ function render(items = []) {
       </div>
     `;
 
-    items.forEach((item) => {
+    groupItems.forEach((item) => {
       section.appendChild(
         createCard(item, {
           showToast: (message) => showToast(toast, message),
@@ -114,7 +125,7 @@ async function load() {
   try {
     const syncResult = await syncPendingClips();
 
-    if (syncResult.synced > 0) {
+    if (syncResult?.synced > 0) {
       showToast(toast, `${syncResult.synced} pending clips synced ✅`);
     }
 
@@ -124,7 +135,7 @@ async function load() {
 
     render(data);
   } catch (error) {
-    console.error(error);
+    console.error("Load error:", error);
 
     const local = await chrome.storage.local.get("clips");
     data = local.clips || [];
@@ -133,37 +144,30 @@ async function load() {
 
     if (data.length) {
       showToast(toast, "Showing local clips. Server unavailable.");
-    } else {
+    } else if (list) {
       list.innerHTML = `<div class="empty">Failed to load clips ❌</div>`;
     }
   }
 }
 
 /* SEARCH */
-search?.addEventListener(
-  "input",
-  (e) => {
+search?.addEventListener("input", (event) => {
+  const query = event.target.value;
 
-    const query =
-      e.target.value;
+  const filtered = smartSearch(data, query);
 
-    const filtered =
-      smartSearch(
-        data,
-        query
-      );
-
-    render(filtered);
-  }
-);
+  render(filtered);
+});
 
 /* FILTER TABS */
 document.querySelectorAll(".tab").forEach((tab) => {
   tab.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".tab")
+      .forEach((button) => button.classList.remove("active"));
 
     tab.classList.add("active");
-    currentFilter = tab.dataset.type;
+    currentFilter = tab.dataset.type || "all";
 
     render(data);
   });
@@ -171,31 +175,15 @@ document.querySelectorAll(".tab").forEach((tab) => {
 
 /* TRENDING */
 async function loadTrending() {
-
   try {
+    const trending = await fetchTrendingClips();
 
-    const trending =
-      await fetchTrendingClips();
+    if (!Array.isArray(trending) || !trending.length || !list) return;
 
-    if (
-      !Array.isArray(trending) ||
-      !trending.length
-    ) {
-      return;
-    }
+    document.querySelector(".trending-section")?.remove();
 
-    /* REMOVE OLD */
-    document
-      .querySelector(
-        ".trending-section"
-      )
-      ?.remove();
-
-    const section =
-      document.createElement("div");
-
-    section.className =
-      "timeline-section trending-section";
+    const section = document.createElement("div");
+    section.className = "timeline-section trending-section";
 
     section.innerHTML = `
       <div class="timeline-title">
@@ -204,12 +192,9 @@ async function loadTrending() {
     `;
 
     trending.forEach((item) => {
-
       section.appendChild(
         createCard(item, {
-          showToast: (message) =>
-            showToast(toast, message),
-
+          showToast: (message) => showToast(toast, message),
           load,
           render,
           data,
@@ -218,85 +203,100 @@ async function loadTrending() {
     });
 
     list.prepend(section);
-
-  } catch (err) {
-
-    console.error(
-      "Trending error:",
-      err
-    );
+  } catch (error) {
+    console.error("Trending error:", error);
   }
 }
 
+/* SMART CHIPS */
+function setupSmartChips() {
+  document.querySelectorAll(".smart-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const query = chip.dataset.smart || "";
+
+      if (search) {
+        search.value = query;
+      }
+
+      const filtered = smartSearch(data, query);
+
+      render(filtered);
+    });
+  });
+}
+
+/* GLOBAL ERROR UI */
+function showGlobalError(message) {
+  const errorBox = document.getElementById("global-error");
+  if (!errorBox) return;
+
+  errorBox.innerHTML = `
+    <div class="error-content">
+      <span>❌ ${message}</span>
+
+      <button id="retry-btn">
+        Retry
+      </button>
+    </div>
+  `;
+
+  errorBox.classList.remove("hidden");
+
+  document
+    .getElementById("retry-btn")
+    ?.addEventListener("click", () => {
+      location.reload();
+    });
+
+  setTimeout(() => {
+    errorBox.classList.add("hidden");
+  }, 5000);
+}
+
+window.addEventListener("error", (event) => {
+  console.error("ClipMind Error:", event.error);
+
+  showGlobalError(event.error?.message || "Unexpected error occurred");
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("ClipMind Promise Error:", event.reason);
+
+  showGlobalError(event.reason?.message || "Request failed");
+});
+
 /* INIT */
 async function init() {
+  await updateBackendStatus();
 
-  const token =
-    await getToken();
+  const token = await getToken();
 
   if (!token) {
+    app?.classList.add("hidden");
 
-    app.classList.add(
-      "hidden"
-    );
+    renderAuth(authContainer, async () => {
+      authContainer.innerHTML = "";
 
-    renderAuth(
-      authContainer,
+      app?.classList.remove("hidden");
 
-      async () => {
+      await updateBackendStatus();
+      await load();
+      await loadTrending();
 
-        authContainer.innerHTML =
-          "";
-
-        app.classList.remove(
-          "hidden"
-        );
-
-        await load();
-
-        await loadTrending();
-
-        setupLogout();
-      }
-    );
+      setupLogout();
+      setupSmartChips();
+    });
 
     return;
   }
 
-  app.classList.remove(
-    "hidden"
-  );
+  app?.classList.remove("hidden");
 
   await load();
-
   await loadTrending();
 
   setupLogout();
+  setupSmartChips();
 }
-
-document
-  .querySelectorAll(".smart-chip")
-  .forEach((chip) => {
-
-    chip.addEventListener(
-      "click",
-      () => {
-
-        const query =
-          chip.dataset.smart;
-
-        search.value =
-          query;
-
-        const filtered =
-          smartSearch(
-            data,
-            query
-          );
-
-        render(filtered);
-      }
-    );
-  });
 
 init();

@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq"
   
   root "home#index"
+  get "/health", to: proc { [200, {}, ["OK"]] }
   
   get    "login",  to: "auth/sessions#new",     as: :login
   post   "login",  to: "auth/sessions#create"

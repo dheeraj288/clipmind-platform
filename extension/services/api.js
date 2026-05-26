@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./config.js";
+import { API_BASE_URL } from "../config.js";
 
 import { getToken, logoutUser } from "./auth.js";
 
@@ -72,4 +72,16 @@ export async function fetchTrendingClips() {
   return request(
     `${API_BASE_URL}/clips/trending`
   );
+}
+
+export async function checkBackendHealth() {
+  try {
+    const response = await fetch(
+      API_BASE_URL.replace("/api/v1", "/health")
+    )
+
+    return response.ok
+  } catch {
+    return false
+  }
 }

@@ -1047,3 +1047,39 @@ pre{
 .sync-pill.synced::before{
   background:#22c55e;
 }
+
+.server-status{
+  margin-top:4px;
+  font-size:10px;
+  font-weight:800;
+  color:#94a3b8;
+}
+
+.global-error{
+  margin:10px;
+  padding:12px;
+  border-radius:14px;
+  background:rgba(239,68,68,.12);
+  border:1px solid rgba(239,68,68,.25);
+}
+
+.error-content{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.hidden{
+  display:none;
+}
+
+#error-btn,
+#retry-btn{
+  border:none;
+  border-radius:10px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}

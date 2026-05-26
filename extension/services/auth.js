@@ -1,5 +1,4 @@
-import { API_BASE_URL } from "./config.js";
-
+import { API_BASE_URL } from "../config.js";
 /* SAFE JSON PARSER */
 async function safeJson(response) {
   try {
@@ -11,7 +10,7 @@ async function safeJson(response) {
 
 /* LOGIN */
 export async function loginUser(email, password) {
-  const response = await fetch(`${API_BASE}/login`, {
+  const response = await fetch(`${API_BASE_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,7 +42,7 @@ export async function loginUser(email, password) {
 
 /* SIGNUP */
 export async function signupUser(payload) {
-  const response = await fetch(`${API_BASE}/signup`, {
+  const response = await fetch(`${API_BASE_URL}/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
