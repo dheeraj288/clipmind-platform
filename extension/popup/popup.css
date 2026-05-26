@@ -1001,3 +1001,49 @@ pre{
 ::-webkit-scrollbar-track{
   background:transparent;
 }
+
+.card-footer-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+
+.sync-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:800;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.sync-pill::before{
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:999px;
+}
+
+.sync-pill.pending{
+  border:1px solid rgba(245,158,11,.22);
+  background:rgba(245,158,11,.10);
+  color:#fbbf24;
+}
+
+.sync-pill.pending::before{
+  background:#fbbf24;
+}
+
+.sync-pill.synced{
+  border:1px solid rgba(34,197,94,.22);
+  background:rgba(34,197,94,.10);
+  color:#86efac;
+}
+
+.sync-pill.synced::before{
+  background:#22c55e;
+}

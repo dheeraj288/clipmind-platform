@@ -265,10 +265,19 @@ export function createCard(
 
     <div class="time">
 
-      <span>
-        ${safeTime(item)}
-      </span>
+      <div class="card-footer-left">
+        <span>
+          ${safeTime(item)}
+        </span>
 
+        ${
+          item.pending_sync || item.sync_status === "pending"
+            ? `<span class="sync-pill pending">Pending</span>`
+            : item.sync_status === "synced"
+              ? `<span class="sync-pill synced">Synced</span>`
+              : ""
+        }
+      </div>
       <span class="copy-count">
         📋 ${item.copy_count || 0}
       </span>

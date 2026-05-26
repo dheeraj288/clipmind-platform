@@ -1,7 +1,8 @@
 import { createCard } from "./components/ClipCard.js";
 import { groupItems } from "./utils/groupItems.js";
 import { sortData } from "./utils/smartScore.js";
-import {fetchClips,fetchTrendingClips,} from "../services/api.js";
+import { fetchClips, fetchTrendingClips } from "../services/api.js";
+import { syncPendingClips } from "../services/syncQueue.js";
 import { smartSearch } from "./utils/smartSearch.js";
 import { getRecommendations } from "./utils/aiMemory.js";
 import { getToken, logoutUser } from "../services/auth.js";
@@ -111,6 +112,12 @@ function render(items = []) {
 /* LOAD */
 async function load() {
   try {
+    const syncResult = await syncPendingClips();
+
+    if (syncResult.synced > 0) {
+      showToast(toast, `${syncResult.synced} pending clips synced ✅`);
+    }
+
     const response = await fetchClips();
 
     data = Array.isArray(response) ? response : [];
@@ -118,7 +125,17 @@ async function load() {
     render(data);
   } catch (error) {
     console.error(error);
-    list.innerHTML = `<div class="empty">Failed to load clips ❌</div>`;
+
+    const local = await chrome.storage.local.get("clips");
+    data = local.clips || [];
+
+    render(data);
+
+    if (data.length) {
+      showToast(toast, "Showing local clips. Server unavailable.");
+    } else {
+      list.innerHTML = `<div class="empty">Failed to load clips ❌</div>`;
+    }
   }
 }
 
