@@ -1,14 +1,25 @@
-# Rails
-backend/tmp
-backend/log
-backend/storage
-backend/.env
-backend/.bundle
-backend/node_modules
-
-# Extension
-extension/node_modules
-
-# system
+# macOS
 .DS_Store
+
+# Logs
 *.log
+
+# Environment variables & secrets
+backend/.env
+backend/.env.*
+backend/config/master.key
+
+# Bundler
+backend/.bundle/
+
+# Node modules
+backend/node_modules/
+extension/node_modules/
+
+# Rails runtime files
+backend/log/*
+backend/tmp/*
+backend/storage/*
+
+# Rails assets
+backend/public/assets/
